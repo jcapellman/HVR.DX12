@@ -1,29 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
+
 using SharpDX.Windows;
+using HVR.ViewModels;
 
 namespace HVR {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window {
+        private MainWindowViewModel viewModel => (MainWindowViewModel)DataContext;
+
         public MainWindow() {
-            var form = new RenderForm("HVR") {
-                Width = 1280,
-                Height = 720,
+            InitializeComponent();
+
+            DataContext = new MainWindowViewModel();
+
+            viewModel.LoadData();
+        }
+
+        private void btnQuit_Click(object sender, RoutedEventArgs e) {
+            Application.Current.Shutdown();
+        }
+
+        private void btnLaunch_Click(object sender, RoutedEventArgs e) {
+            this.Hide();
+
+            var form = new RenderForm("HorrorVR") {
+                Width = viewModel.SelectedScreenResolution.Width,
+                Height = viewModel.SelectedScreenResolution.Height,
+                IsFullscreen = viewModel.IsFullscreen,
                 ShowIcon = false
             };
 
@@ -39,7 +41,6 @@ namespace HVR {
                     }
                 }
             }
-
         }
     }
 }
