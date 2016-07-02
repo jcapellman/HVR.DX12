@@ -28,22 +28,58 @@ namespace HVR.ViewModels {
 
         public MainWindowViewModel() {
             ScreenResolutions = new ObservableCollection<ScreenResolutionListingItem>();
+            Adapters = new ObservableCollection<AdapterListingItem>();
+        }
+
+        private ObservableCollection<AdapterListingItem> _adapters;
+
+        public ObservableCollection<AdapterListingItem> Adapters {
+            get { return _adapters; }
+            set { _adapters = value; OnPropertyChanged(); }
+        }
+
+        private AdapterListingItem _selectedAdapter;
+
+        public AdapterListingItem SelectedAdapter {
+            get { return _selectedAdapter; }
+            set { _selectedAdapter = value; OnPropertyChanged(); updateSupportedResolutions(); }
+        }
+
+        private void updateSupportedResolutions() {
+            var adapterOutput = SelectedAdapter.DXAdapter.Outputs.FirstOrDefault();
+
+            var displayModes = adapterOutput.GetDisplayModeList(SharpDX.DXGI.Format.R8G8B8A8_UNorm_SRgb, SharpDX.DXGI.DisplayModeEnumerationFlags.Scaling);
+
+            ScreenResolutions.Clear();
+            SelectedScreenResolution = null;
+
+            foreach (var displayMode in displayModes.Where(a => a.Scaling == SharpDX.DXGI.DisplayModeScaling.Unspecified)) {
+                var displayStr = $"{displayMode.Width}x{displayMode.Height}";
+
+                if (ScreenResolutions.Any(a => a.Display == displayStr)) {
+                    continue;
+                }
+
+                ScreenResolutions.Add(new ScreenResolutionListingItem {
+                    Display = displayStr,
+                    Width = displayMode.Width,
+                    Height = displayMode.Height
+                });
+            }
+
+            SelectedScreenResolution = ScreenResolutions.FirstOrDefault();
         }
 
         public void LoadData() {
-            ScreenResolutions.Add(new ScreenResolutionListingItem {
-                Width = 1280,
-                Height = 720,
-                Display = "1280x720"
-            });
+            SharpDX.DXGI.Factory1 factory = new SharpDX.DXGI.Factory1();
 
-            ScreenResolutions.Add(new ScreenResolutionListingItem {
-                Width = 1920,
-                Height = 1080,
-                Display = "1920x1080"
-            });
+            foreach (var adapter in factory.Adapters.Where(a => a.Outputs.Count() > 0)) {
+                Adapters.Add(new AdapterListingItem {
+                    DXAdapter = adapter
+                });
+            }
 
-            SelectedScreenResolution = ScreenResolutions.FirstOrDefault();
+            SelectedAdapter = Adapters.FirstOrDefault();
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {
