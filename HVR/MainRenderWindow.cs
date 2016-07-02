@@ -7,14 +7,19 @@ using SharpDX.DXGI;
 
 using Device = SharpDX.Direct3D12.Device;
 using Resource = SharpDX.Direct3D12.Resource;
+using HVR.Objects.Game.Level;
 
 namespace HVR {
     internal class MainRenderWindow : IDisposable {
+        private LevelContainerItem _level;
+
         /// <summary>
         /// Initialise pipeline and assets
         /// </summary>
         /// <param name="form">The form</param>
-        public void Initialize(RenderForm form, Adapter selectedAdapter) {
+        public void Initialize(RenderForm form, Adapter selectedAdapter, LevelContainerItem level) {
+            _level = level;
+
             LoadPipeline(form, selectedAdapter);
             LoadAssets();
         }

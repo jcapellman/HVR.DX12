@@ -88,6 +88,10 @@
     <Compile Include="Common\Constants.cs" />
     <Compile Include="Enums\ConfigOptions.cs" />
     <Compile Include="Helpers\ConfigHelper.cs" />
+    <Compile Include="Helpers\LevelLoaderHelper.cs" />
+    <Compile Include="Objects\Game\Level\LevelContainerItem.cs" />
+    <Compile Include="Objects\Game\Level\LevelGeometryItem.cs" />
+    <Compile Include="Objects\Game\Level\LevelVertexItem.cs" />
     <Compile Include="Objects\Launcher\AdapterListingItem.cs" />
     <Compile Include="Objects\Launcher\ScreenResolutionListingItem.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

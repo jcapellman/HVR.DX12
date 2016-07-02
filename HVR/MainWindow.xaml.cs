@@ -2,6 +2,7 @@
 
 using SharpDX.Windows;
 using HVR.ViewModels;
+using HVR.Helpers;
 
 using MahApps.Metro.Controls;
 
@@ -25,10 +26,17 @@ namespace HVR {
 
         private void btnLaunch_Click(object sender, RoutedEventArgs e) {
             viewModel.SaveConfig();
+            
+            var level = LevelLoaderHelper.GetLevel("e1m1.lvl");
 
-            this.Hide();
+            if (level == null) {
+                MessageBox.Show("Level could not be loaded");
+                return;
+            }
 
-            var form = new RenderForm("HorrorVR") {
+            Hide();
+
+            var form = new RenderForm(Common.Constants.GAME_NAME) {
                 Width = viewModel.SelectedScreenResolution.Width,
                 Height = viewModel.SelectedScreenResolution.Height,
                 IsFullscreen = viewModel.IsFullscreen,
@@ -38,7 +46,7 @@ namespace HVR {
             form.Show();
 
             using (var app = new MainRenderWindow()) {
-                app.Initialize(form, viewModel.SelectedAdapter.DXAdapter);
+                app.Initialize(form, viewModel.SelectedAdapter.DXAdapter, level);
 
                 using (var loop = new RenderLoop(form)) {
                     while (loop.NextFrame()) {
