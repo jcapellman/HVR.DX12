@@ -14,12 +14,12 @@ namespace HVR {
         /// Initialise pipeline and assets
         /// </summary>
         /// <param name="form">The form</param>
-        public void Initialize(RenderForm form) {
-            LoadPipeline(form);
+        public void Initialize(RenderForm form, Adapter selectedAdapter) {
+            LoadPipeline(form, selectedAdapter);
             LoadAssets();
         }
 
-        private void LoadPipeline(RenderForm form) {
+        private void LoadPipeline(RenderForm form, Adapter selectedAdapter) {
             int width = form.ClientSize.Width;
             int height = form.ClientSize.Height;
 
@@ -29,7 +29,7 @@ namespace HVR {
                 DebugInterface.Get().EnableDebugLayer();
             }
 #endif
-            device = new Device(null, SharpDX.Direct3D.FeatureLevel.Level_11_0);
+            device = new Device(selectedAdapter, SharpDX.Direct3D.FeatureLevel.Level_11_0);
             using (var factory = new Factory4()) {
                 // Describe and create the command queue.
                 CommandQueueDescription queueDesc = new CommandQueueDescription(CommandListType.Direct);
@@ -113,7 +113,7 @@ namespace HVR {
 
             // Record commands.
             commandList.ClearRenderTargetView(rtvHandle, new Color4(0, 0.0F, 0.0f, 1), 0, null);
-
+            
             // Indicate that the back buffer will now be used to present.
             commandList.ResourceBarrierTransition(renderTargets[frameIndex], ResourceStates.RenderTarget,
                 ResourceStates.Present);

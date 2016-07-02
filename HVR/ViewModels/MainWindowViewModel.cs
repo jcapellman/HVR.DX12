@@ -71,7 +71,7 @@ namespace HVR.ViewModels {
         }
 
         public void LoadData() {
-            SharpDX.DXGI.Factory1 factory = new SharpDX.DXGI.Factory1();
+            var factory = new SharpDX.DXGI.Factory1();
 
             foreach (var adapter in factory.Adapters.Where(a => a.Outputs.Count() > 0)) {
                 Adapters.Add(new AdapterListingItem {

@@ -3,8 +3,10 @@
 using SharpDX.Windows;
 using HVR.ViewModels;
 
+using MahApps.Metro.Controls;
+
 namespace HVR {
-    public partial class MainWindow : Window {
+    public partial class MainWindow : MetroWindow {
         private MainWindowViewModel viewModel => (MainWindowViewModel)DataContext;
 
         public MainWindow() {
@@ -32,7 +34,7 @@ namespace HVR {
             form.Show();
 
             using (var app = new MainRenderWindow()) {
-                app.Initialize(form);
+                app.Initialize(form, viewModel.SelectedAdapter.DXAdapter);
 
                 using (var loop = new RenderLoop(form)) {
                     while (loop.NextFrame()) {
