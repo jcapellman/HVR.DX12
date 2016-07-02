@@ -112,11 +112,16 @@ namespace HVR {
             rtvHandle += frameIndex * rtvDescriptorSize;
 
             // Record commands.
-            commandList.ClearRenderTargetView(rtvHandle, new Color4(0, 0.0F, 0.0f, 1), 0, null);
+
+            var color = (frameIndex % 100 == 0 ? 0.35f : 0.0f);
+
+            commandList.ClearRenderTargetView(rtvHandle, new Color4(color, color, color, 1), 0, null);
             
             // Indicate that the back buffer will now be used to present.
             commandList.ResourceBarrierTransition(renderTargets[frameIndex], ResourceStates.RenderTarget,
                 ResourceStates.Present);
+
+            
 
             commandList.Close();
         }

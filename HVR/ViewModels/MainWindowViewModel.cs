@@ -45,15 +45,23 @@ namespace HVR.ViewModels {
             set { _selectedAdapter = value; OnPropertyChanged(); updateSupportedResolutions(); }
         }
 
+        public void SaveConfig() {
+            App.CfgHelper.SetConfigOption(Enums.ConfigOptions.SELECTED_ADAPTER, SelectedAdapter.Display);
+            App.CfgHelper.SetConfigOption(Enums.ConfigOptions.SELECTED_FULLSCREEN, IsFullscreen);
+            App.CfgHelper.SetConfigOption(Enums.ConfigOptions.SELECTED_RESOLUTION, SelectedScreenResolution.Display);
+
+            App.CfgHelper.WriteConfig();
+        }
+
         private void updateSupportedResolutions() {
             var adapterOutput = SelectedAdapter.DXAdapter.Outputs.FirstOrDefault();
-
+            
             var displayModes = adapterOutput.GetDisplayModeList(SharpDX.DXGI.Format.R8G8B8A8_UNorm_SRgb, SharpDX.DXGI.DisplayModeEnumerationFlags.Scaling);
 
             ScreenResolutions.Clear();
             SelectedScreenResolution = null;
 
-            foreach (var displayMode in displayModes.Where(a => a.Scaling == SharpDX.DXGI.DisplayModeScaling.Unspecified)) {
+            foreach (var displayMode in displayModes.Where(a => a.Scaling == SharpDX.DXGI.DisplayModeScaling.Unspecified && a.Width >= 1280)) {
                 var displayStr = $"{displayMode.Width}x{displayMode.Height}";
 
                 if (ScreenResolutions.Any(a => a.Display == displayStr)) {
@@ -67,10 +75,18 @@ namespace HVR.ViewModels {
                 });
             }
 
-            SelectedScreenResolution = ScreenResolutions.FirstOrDefault();
+            var cfgSelectedScreenResolution = App.CfgHelper.GetConfigOption(Enums.ConfigOptions.SELECTED_RESOLUTION);
+
+            if (!ScreenResolutions.Any(a => a.Display == cfgSelectedScreenResolution)) {
+                SelectedScreenResolution = ScreenResolutions.FirstOrDefault();
+            }
+
+            SelectedScreenResolution = ScreenResolutions.FirstOrDefault(a => a.Display == cfgSelectedScreenResolution);
         }
 
         public void LoadData() {
+            IsFullscreen = App.CfgHelper.GetConfigOption(Enums.ConfigOptions.SELECTED_FULLSCREEN);
+            
             var factory = new SharpDX.DXGI.Factory1();
 
             foreach (var adapter in factory.Adapters.Where(a => a.Outputs.Count() > 0)) {
@@ -79,7 +95,14 @@ namespace HVR.ViewModels {
                 });
             }
 
-            SelectedAdapter = Adapters.FirstOrDefault();
+            var cfgSelectedAdapter = App.CfgHelper.GetConfigOption(Enums.ConfigOptions.SELECTED_ADAPTER);
+
+            if (Adapters.Any(a => a.Display != cfgSelectedAdapter) || Adapters.FirstOrDefault().Display == cfgSelectedAdapter) {
+                SelectedAdapter = Adapters.FirstOrDefault();
+                return;
+            }
+
+            SelectedAdapter = Adapters.FirstOrDefault(a => a.Display == cfgSelectedAdapter);
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {

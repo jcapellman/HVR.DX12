@@ -18,10 +18,14 @@ namespace HVR {
         }
 
         private void btnQuit_Click(object sender, RoutedEventArgs e) {
+            viewModel.SaveConfig();
+
             Application.Current.Shutdown();
         }
 
         private void btnLaunch_Click(object sender, RoutedEventArgs e) {
+            viewModel.SaveConfig();
+
             this.Hide();
 
             var form = new RenderForm("HorrorVR") {
