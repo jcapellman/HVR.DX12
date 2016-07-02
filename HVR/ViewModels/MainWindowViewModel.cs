@@ -29,6 +29,7 @@ namespace HVR.ViewModels {
         public MainWindowViewModel() {
             ScreenResolutions = new ObservableCollection<ScreenResolutionListingItem>();
             Adapters = new ObservableCollection<AdapterListingItem>();
+            MutliSamplingValues = new ObservableCollection<int>();
         }
 
         private ObservableCollection<AdapterListingItem> _adapters;
@@ -40,6 +41,20 @@ namespace HVR.ViewModels {
 
         private AdapterListingItem _selectedAdapter;
 
+        private ObservableCollection<int> _multiSamplingValues;
+
+        public ObservableCollection<int> MutliSamplingValues {
+            get { return _multiSamplingValues; }
+            set { _multiSamplingValues = value;  OnPropertyChanged(); }
+        }
+
+        private int _selectedMultiSample;
+
+        public int SelectedMultiSample {
+            get { return _selectedMultiSample; }
+            set { _selectedMultiSample = value;  OnPropertyChanged(); }
+        }
+
         public AdapterListingItem SelectedAdapter {
             get { return _selectedAdapter; }
             set { _selectedAdapter = value; OnPropertyChanged(); updateSupportedResolutions(); }
@@ -49,6 +64,7 @@ namespace HVR.ViewModels {
             App.CfgHelper.SetConfigOption(Enums.ConfigOptions.SELECTED_ADAPTER, SelectedAdapter.Display);
             App.CfgHelper.SetConfigOption(Enums.ConfigOptions.SELECTED_FULLSCREEN, IsFullscreen);
             App.CfgHelper.SetConfigOption(Enums.ConfigOptions.SELECTED_RESOLUTION, SelectedScreenResolution.Display);
+            App.CfgHelper.SetConfigOption(Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE, SelectedMultiSample);
 
             App.CfgHelper.WriteConfig();
         }
@@ -86,7 +102,14 @@ namespace HVR.ViewModels {
 
         public void LoadData() {
             IsFullscreen = App.CfgHelper.GetConfigOption(Enums.ConfigOptions.SELECTED_FULLSCREEN);
-            
+            SelectedMultiSample = App.CfgHelper.GetConfigOption(Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE);
+
+            MutliSamplingValues.Add(1);
+            MutliSamplingValues.Add(2);
+            MutliSamplingValues.Add(4);
+            MutliSamplingValues.Add(8);
+            MutliSamplingValues.Add(16);
+
             var factory = new SharpDX.DXGI.Factory1();
 
             foreach (var adapter in factory.Adapters.Where(a => a.Outputs.Count() > 0)) {

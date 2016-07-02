@@ -49,7 +49,7 @@ namespace HVR {
                     SwapEffect = SwapEffect.FlipDiscard,
                     OutputHandle = form.Handle,
                     //Flags = SwapChainFlags.None,
-                    SampleDescription = new SampleDescription(1, 0),
+                    SampleDescription = new SampleDescription(App.CfgHelper.GetConfigOption(Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE), 0),
                     IsWindowed = true
                 };
 

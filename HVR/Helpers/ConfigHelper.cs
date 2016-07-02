@@ -10,14 +10,16 @@ namespace HVR.Helpers {
     public class ConfigHelper {
         private Dictionary<ConfigOptions, object> _configData;
 
+        private string configFileName => $"{Common.Constants.DEFAULT_GAME_MOD}/{Common.Constants.CONFIG_FILENAME}";
+
         public ConfigHelper() {
             _configData = new Dictionary<ConfigOptions, object>();
             
-            if (!File.Exists(Common.Constants.CONFIG_FILENAME)) {
+            if (!File.Exists(configFileName)) {
                 return;
             }
 
-            var fileStr = File.ReadAllText(Common.Constants.CONFIG_FILENAME);
+            var fileStr = File.ReadAllText(configFileName);
 
             _configData = JsonConvert.DeserializeObject<Dictionary<ConfigOptions, object>>(fileStr);
         }
@@ -34,13 +36,15 @@ namespace HVR.Helpers {
                     return false;
                 case ConfigOptions.SELECTED_RESOLUTION:
                     return "1280x720";
+                case ConfigOptions.SELECTED_MULTISAMPLE_VALUE:
+                    return 4;
             }
 
             return null;
         }
 
         public void WriteConfig() {
-            File.WriteAllText(Common.Constants.CONFIG_FILENAME, JsonConvert.SerializeObject(_configData));
+            File.WriteAllText(configFileName, JsonConvert.SerializeObject(_configData));
         }
 
         public dynamic GetConfigOption(ConfigOptions configOption) {
@@ -53,6 +57,8 @@ namespace HVR.Helpers {
                     return _configData[configOption];
                 case ConfigOptions.SELECTED_FULLSCREEN:
                     return Convert.ToBoolean(_configData[configOption]);
+                case ConfigOptions.SELECTED_MULTISAMPLE_VALUE:
+                    return Convert.ToInt32(_configData[configOption]);
             }
 
             return null;

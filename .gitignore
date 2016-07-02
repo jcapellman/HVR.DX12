@@ -1,4 +1,9 @@
 ﻿bin/
 obj/
 .vs/
+/bin/
+/publish/
 /HVR/bin/Debug
+/HVR/bin/Release
+/HVR/publish
+/HVR/HVR.csproj.user
