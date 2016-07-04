@@ -2,7 +2,7 @@
 
 using Newtonsoft.Json;
 
-using HVR.Objects.Game.Level;
+using HVR.Common.Objects.Game.Level;
 
 namespace HVR.Helpers {
     public class LevelLoaderHelper {

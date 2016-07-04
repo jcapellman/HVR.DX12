@@ -1,4 +1,4 @@
-﻿namespace HVR.Objects.Game.Level {
+﻿namespace HVR.Common.Objects.Game.Level {
     public class LevelVertexItem {
         public float X1 { get; set; }
 

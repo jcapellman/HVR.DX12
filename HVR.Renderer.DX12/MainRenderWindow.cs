@@ -9,8 +9,10 @@ using Device = SharpDX.Direct3D12.Device;
 using Resource = SharpDX.Direct3D12.Resource;
 using HVR.Common.Objects.Game.Level;
 
-namespace HVR {
-    internal class MainRenderWindow : IDisposable {
+using HVR.Common.Interfaces;
+
+namespace HVR.Renderer.DX12 {
+    internal class MainRenderWindow : IRenderer {
         private LevelContainerItem _level;
 
         /// <summary>
@@ -49,7 +51,7 @@ namespace HVR {
                     SwapEffect = SwapEffect.FlipDiscard,
                     OutputHandle = form.Handle,
                     //Flags = SwapChainFlags.None,
-                    SampleDescription = new SampleDescription(App.CfgHelper.GetConfigOption(Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE), 0),
+                    SampleDescription = new SampleDescription(App.CfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE), 0),
                     IsWindowed = true
                 };
 

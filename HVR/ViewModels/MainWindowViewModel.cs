@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-using HVR.Objects.Launcher;
+using HVR.Common.Objects.Launcher;
 
 namespace HVR.ViewModels {
     public class MainWindowViewModel : INotifyPropertyChanged {

@@ -1,4 +1,4 @@
-﻿namespace HVR.Objects.Launcher {
+﻿namespace HVR.Common.Objects.Launcher {
     public class ScreenResolutionListingItem {
         public string Display { get; set; }
 

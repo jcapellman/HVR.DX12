@@ -1,6 +1,6 @@
 ﻿using SharpDX.DXGI;
 
-namespace HVR.Objects.Launcher {
+namespace HVR.Common.Objects.Launcher {
     public class AdapterListingItem {
         public Adapter DXAdapter { get; set; }
 

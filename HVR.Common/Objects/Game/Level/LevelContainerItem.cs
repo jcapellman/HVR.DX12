@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HVR.Objects.Game.Level {
+namespace HVR.Common.Objects.Game.Level {
     public class LevelContainerItem {
         public string Title { get; set; }
 

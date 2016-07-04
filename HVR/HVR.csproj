@@ -123,11 +123,6 @@
     <Compile Include="Enums\ConfigOptions.cs" />
     <Compile Include="Helpers\ConfigHelper.cs" />
     <Compile Include="Helpers\LevelLoaderHelper.cs" />
-    <Compile Include="Objects\Game\Level\LevelContainerItem.cs" />
-    <Compile Include="Objects\Game\Level\LevelGeometryItem.cs" />
-    <Compile Include="Objects\Game\Level\LevelVertexItem.cs" />
-    <Compile Include="Objects\Launcher\AdapterListingItem.cs" />
-    <Compile Include="Objects\Launcher\ScreenResolutionListingItem.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -187,6 +182,16 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HVR.Common\HVR.Common.csproj">
+      <Project>{5576437f-2104-4b55-8740-3ec48fb3581b}</Project>
+      <Name>HVR.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HVR.Renderer.DX12\HVR.Renderer.DX12.csproj">
+      <Project>{b81820ee-1a5c-4f77-a5eb-e6fb0c3e6334}</Project>
+      <Name>HVR.Renderer.DX12</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
