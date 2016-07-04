@@ -3,6 +3,6 @@ using System;
 
 namespace HVR.Common.Interfaces {
     public interface ISoundRenderer : IDisposable {
-        void Play(SoundItem soundItem, bool loop = false);
+        void Play(SoundItem soundItem, bool cached = true, bool loop = false);
     }
 }

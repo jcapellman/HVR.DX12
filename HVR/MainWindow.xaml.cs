@@ -11,6 +11,7 @@ using HVR.SoundRenderer.DX12;
 namespace HVR {
     public partial class MainWindow : MetroWindow {
         private MainWindowViewModel viewModel => (MainWindowViewModel)DataContext;
+        private DX12SoundRenderer sndRenderer = new DX12SoundRenderer();
 
         public MainWindow() {
             InitializeComponent();
@@ -63,8 +64,6 @@ namespace HVR {
             var sndItem = new SoundItem {
                 FileName = Common.Helpers.PathHelper.GetPath(Common.Enums.ResourceTypes.Sound, "Atmospheric/breathing.wav")
             };
-
-            var sndRenderer = new DX12SoundRenderer();
             
             sndRenderer.Play(sndItem);
         }
