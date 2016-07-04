@@ -13,7 +13,7 @@ using HVR.Common.Interfaces;
 using HVR.Common.Helpers;
 
 namespace HVR.Renderer.DX12 {
-    internal class MainRenderWindow : IRenderer {
+    public class MainRenderWindow : IRenderer {
         private LevelContainerItem _level;
         private ConfigHelper _cfgHelper;
 

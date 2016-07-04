@@ -3,9 +3,10 @@
 using SharpDX.Windows;
 using HVR.ViewModels;
 using HVR.Common.Helpers;
-using HVR.DX12;
 
 using MahApps.Metro.Controls;
+using HVR.Common.Objects.Global;
+using HVR.SoundRenderer.DX12;
 
 namespace HVR {
     public partial class MainWindow : MetroWindow {
@@ -46,7 +47,7 @@ namespace HVR {
 
             form.Show();
 
-            using (var app = new MainRenderWindow()) {
+            using (var app = new HVR.Renderer.DX12.MainRenderWindow()) {
                 app.Initialize(form, viewModel.SelectedAdapter.DXAdapter, level, App.CfgHelper);
 
                 using (var loop = new RenderLoop(form)) {
@@ -56,6 +57,16 @@ namespace HVR {
                     }
                 }
             }
+        }
+
+        private void btnLaunch_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) {
+            var sndItem = new SoundItem {
+                FileName = Common.Helpers.PathHelper.GetPath(Common.Enums.ResourceTypes.Sound, "Atmospheric/breathing.wav")
+            };
+
+            var sndRenderer = new DX12SoundRenderer();
+            
+            sndRenderer.Play(sndItem);
         }
     }
 }

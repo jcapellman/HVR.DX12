@@ -5,20 +5,16 @@ using HVR.Common.Objects.Global;
 
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
+using System;
 
 namespace HVR.SoundRenderer.DX12 {
     public class DX12SoundRenderer : ISoundRenderer {
         private XAudio2 _xaudio2;
         private MasteringVoice _masteringVoice;
 
-        public void Init() {
+        public DX12SoundRenderer() {
             _xaudio2 = new XAudio2();
             _masteringVoice = new MasteringVoice(_xaudio2);
-        }
-
-        public void DeInit() {
-            _masteringVoice.Dispose();
-            _xaudio2.Dispose();
         }
 
         public void Play(SoundItem soundItem, bool loop = false) {
@@ -31,10 +27,15 @@ namespace HVR.SoundRenderer.DX12 {
                 Flags = BufferFlags.EndOfStream
             };
 
-            var sourceVoice = new SourceVoice(_xaudio2, waveFormat, true);
+            var sourceVoice = new SourceVoice(_xaudio2, waveFormat, false);
 
             sourceVoice.SubmitSourceBuffer(buffer, stream.DecodedPacketsInfo);
             sourceVoice.Start();
+        }
+
+        void IDisposable.Dispose() {
+            _masteringVoice.Dispose();
+            _xaudio2.Dispose();
         }
     }
 }
