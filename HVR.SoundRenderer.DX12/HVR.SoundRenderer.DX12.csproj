@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5576437F-2104-4B55-8740-3EC48FB3581B}</ProjectGuid>
+    <ProjectGuid>{284901FC-357D-4291-ACC3-EAE8AB71BA2C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HVR.Common</RootNamespace>
-    <AssemblyName>HVR.Common</AssemblyName>
+    <RootNamespace>HVR.SoundRenderer.DX12</RootNamespace>
+    <AssemblyName>HVR.SoundRenderer.DX12</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,21 +30,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="SharpDX, Version=3.0.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.3.0.2\lib\net45\SharpDX.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SharpDX.DXGI, Version=3.0.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpDX.DXGI.3.0.2\lib\net45\SharpDX.DXGI.dll</HintPath>
+    <Reference Include="SharpDX.XAudio2, Version=3.0.2.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpDX.XAudio2.3.0.2\lib\net45\SharpDX.XAudio2.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,22 +48,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\Constants.cs" />
-    <Compile Include="Enums\ConfigOptions.cs" />
-    <Compile Include="Helpers\ConfigHelper.cs" />
-    <Compile Include="Helpers\LevelLoaderHelper.cs" />
-    <Compile Include="Interfaces\IRenderer.cs" />
-    <Compile Include="Interfaces\ISoundRenderer.cs" />
-    <Compile Include="Objects\Game\Level\LevelContainerItem.cs" />
-    <Compile Include="Objects\Game\Level\LevelGeometryItem.cs" />
-    <Compile Include="Objects\Game\Level\LevelVertexItem.cs" />
-    <Compile Include="Objects\Global\SoundItem.cs" />
-    <Compile Include="Objects\Launcher\AdapterListingItem.cs" />
-    <Compile Include="Objects\Launcher\ScreenResolutionListingItem.cs" />
+    <Compile Include="DX12SoundRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HVR.Common\HVR.Common.csproj">
+      <Project>{5576437F-2104-4B55-8740-3EC48FB3581B}</Project>
+      <Name>HVR.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

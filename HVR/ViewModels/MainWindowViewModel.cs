@@ -61,10 +61,10 @@ namespace HVR.ViewModels {
         }
 
         public void SaveConfig() {
-            App.CfgHelper.SetConfigOption(Enums.ConfigOptions.SELECTED_ADAPTER, SelectedAdapter.Display);
-            App.CfgHelper.SetConfigOption(Enums.ConfigOptions.SELECTED_FULLSCREEN, IsFullscreen);
-            App.CfgHelper.SetConfigOption(Enums.ConfigOptions.SELECTED_RESOLUTION, SelectedScreenResolution.Display);
-            App.CfgHelper.SetConfigOption(Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE, SelectedMultiSample);
+            App.CfgHelper.SetConfigOption(Common.Enums.ConfigOptions.SELECTED_ADAPTER, SelectedAdapter.Display);
+            App.CfgHelper.SetConfigOption(Common.Enums.ConfigOptions.SELECTED_FULLSCREEN, IsFullscreen);
+            App.CfgHelper.SetConfigOption(Common.Enums.ConfigOptions.SELECTED_RESOLUTION, SelectedScreenResolution.Display);
+            App.CfgHelper.SetConfigOption(Common.Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE, SelectedMultiSample);
 
             App.CfgHelper.WriteConfig();
         }
@@ -91,7 +91,7 @@ namespace HVR.ViewModels {
                 });
             }
 
-            var cfgSelectedScreenResolution = App.CfgHelper.GetConfigOption(Enums.ConfigOptions.SELECTED_RESOLUTION);
+            var cfgSelectedScreenResolution = App.CfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_RESOLUTION);
 
             if (!ScreenResolutions.Any(a => a.Display == cfgSelectedScreenResolution)) {
                 SelectedScreenResolution = ScreenResolutions.FirstOrDefault();
@@ -101,8 +101,8 @@ namespace HVR.ViewModels {
         }
 
         public void LoadData() {
-            IsFullscreen = App.CfgHelper.GetConfigOption(Enums.ConfigOptions.SELECTED_FULLSCREEN);
-            SelectedMultiSample = App.CfgHelper.GetConfigOption(Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE);
+            IsFullscreen = App.CfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_FULLSCREEN);
+            SelectedMultiSample = App.CfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE);
 
             MutliSamplingValues.Add(1);
             MutliSamplingValues.Add(2);
@@ -118,7 +118,7 @@ namespace HVR.ViewModels {
                 });
             }
 
-            var cfgSelectedAdapter = App.CfgHelper.GetConfigOption(Enums.ConfigOptions.SELECTED_ADAPTER);
+            var cfgSelectedAdapter = App.CfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_ADAPTER);
 
             if (Adapters.Any(a => a.Display != cfgSelectedAdapter) || Adapters.FirstOrDefault().Display == cfgSelectedAdapter) {
                 SelectedAdapter = Adapters.FirstOrDefault();

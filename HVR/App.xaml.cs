@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-using HVR.Helpers;
+using HVR.Common.Helpers;
 
 namespace HVR {
     public partial class App : Application {

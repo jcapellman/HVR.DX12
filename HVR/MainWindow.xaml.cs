@@ -2,7 +2,8 @@
 
 using SharpDX.Windows;
 using HVR.ViewModels;
-using HVR.Helpers;
+using HVR.Common.Helpers;
+using HVR.DX12;
 
 using MahApps.Metro.Controls;
 
@@ -46,7 +47,7 @@ namespace HVR {
             form.Show();
 
             using (var app = new MainRenderWindow()) {
-                app.Initialize(form, viewModel.SelectedAdapter.DXAdapter, level);
+                app.Initialize(form, viewModel.SelectedAdapter.DXAdapter, level, App.CfgHelper);
 
                 using (var loop = new RenderLoop(form)) {
                     while (loop.NextFrame()) {

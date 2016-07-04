@@ -10,17 +10,20 @@ using Resource = SharpDX.Direct3D12.Resource;
 using HVR.Common.Objects.Game.Level;
 
 using HVR.Common.Interfaces;
+using HVR.Common.Helpers;
 
 namespace HVR.Renderer.DX12 {
     internal class MainRenderWindow : IRenderer {
         private LevelContainerItem _level;
+        private ConfigHelper _cfgHelper;
 
         /// <summary>
         /// Initialise pipeline and assets
         /// </summary>
         /// <param name="form">The form</param>
-        public void Initialize(RenderForm form, Adapter selectedAdapter, LevelContainerItem level) {
+        public void Initialize(RenderForm form, Adapter selectedAdapter, LevelContainerItem level, ConfigHelper cfgHelper) {
             _level = level;
+            _cfgHelper = cfgHelper;
 
             LoadPipeline(form, selectedAdapter);
             LoadAssets();
@@ -51,7 +54,7 @@ namespace HVR.Renderer.DX12 {
                     SwapEffect = SwapEffect.FlipDiscard,
                     OutputHandle = form.Handle,
                     //Flags = SwapChainFlags.None,
-                    SampleDescription = new SampleDescription(App.CfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE), 0),
+                    SampleDescription = new SampleDescription(_cfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE), 0),
                     IsWindowed = true
                 };
 

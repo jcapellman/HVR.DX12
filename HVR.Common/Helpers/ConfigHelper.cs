@@ -4,9 +4,9 @@ using System.IO;
 
 using Newtonsoft.Json;
 
-using HVR.Enums;
+using HVR.Common.Enums;
 
-namespace HVR.Helpers {
+namespace HVR.Common.Helpers {
     public class ConfigHelper {
         private Dictionary<ConfigOptions, object> _configData;
 
