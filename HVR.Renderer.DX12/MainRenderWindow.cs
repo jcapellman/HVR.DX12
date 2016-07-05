@@ -19,7 +19,7 @@ namespace HVR.Renderer.DX12 {
     public class MainRenderWindow : IRenderer {
         private LevelContainerItem _level;
         private ConfigHelper _cfgHelper;
-        private StopWatchHelper _stopWatch = new StopWatchHelper();
+        private FPSCounterHelper _fpsCounter = new FPSCounterHelper();
 
         private bool _enableFPSCounter = true;
 
@@ -32,9 +32,7 @@ namespace HVR.Renderer.DX12 {
         private Rectangle scissorRect;
         private Resource texture;
 
-        private float _frameAccumulator;
-        private int _frameCount;
-
+        
         const int TextureWidth = 256;
         const int TextureHeight = 256;
         const int TexturePixelSize = 4;	// The number of bytes used to represent a pixel in the texture.
@@ -70,7 +68,7 @@ namespace HVR.Renderer.DX12 {
             _enableFPSCounter = cfgHelper.GetConfigOption(Common.Enums.ConfigOptions.ENABLE_FPS_COUNTER);
 
             if (_enableFPSCounter) {
-                _stopWatch.Start();
+                _fpsCounter.Start();
             }
 
             LoadPipeline(form, selectedAdapter);
@@ -363,28 +361,12 @@ namespace HVR.Renderer.DX12 {
         }
 
         public void Update() {
-            FrameDelta = (float)_stopWatch.Update();
+            _fpsCounter.Update();
         }
-
-        public float FrameDelta { get; private set; }
         
-        public float FramePerSecond { get; private set; }
-
-        private void CalculateFPS() {
-            _frameAccumulator += FrameDelta;
-            ++_frameCount;
-            if (_frameAccumulator >= 1.0f) {
-                FramePerSecond = _frameCount / _frameAccumulator;
-
-                _form.Text = Common.Constants.GAME_NAME + " - FPS: " + Math.Round(FramePerSecond, 0);
-                _frameAccumulator = 0.0f;
-                _frameCount = 0;
-            }
-        }
-
         public void Render() {
             if (_enableFPSCounter) {
-                CalculateFPS();
+                _fpsCounter.Calculate(ref _form);
             }
 
             // Record all the commands we need to render the scene into the command list.

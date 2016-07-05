@@ -75,6 +75,7 @@
     <Compile Include="Enums\ConfigOptions.cs" />
     <Compile Include="Enums\ResourceType.cs" />
     <Compile Include="Helpers\ConfigHelper.cs" />
+    <Compile Include="Helpers\FPSCounterHelper.cs" />
     <Compile Include="Helpers\LevelLoaderHelper.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
     <Compile Include="Helpers\StopWatchHelper.cs" />
