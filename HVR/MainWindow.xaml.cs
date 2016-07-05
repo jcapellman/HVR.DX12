@@ -49,7 +49,7 @@ namespace HVR {
             form.Show();
 
             using (var app = new HVR.Renderer.DX12.MainRenderWindow()) {
-                app.Initialize(form, viewModel.SelectedAdapter.DXAdapter, level, App.CfgHelper);
+                app.Initialize(ref form, viewModel.SelectedAdapter.DXAdapter, level, App.CfgHelper);
 
                 using (var loop = new RenderLoop(form)) {
                     while (loop.NextFrame()) {
@@ -61,11 +61,11 @@ namespace HVR {
         }
 
         private void btnLaunch_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) {
-            var sndItem = new SoundItem {
-                FileName = Common.Helpers.PathHelper.GetPath(Common.Enums.ResourceTypes.Sounds, "Atmospheric/breathing.wav")
-            };
+            //var sndItem = new SoundItem {
+            //    FileName = Common.Helpers.PathHelper.GetPath(Common.Enums.ResourceTypes.Sounds, "Atmospheric/breathing.wav")
+            //};
             
-            sndRenderer.Play(sndItem);
+            //sndRenderer.Play(sndItem);
         }
     }
 }

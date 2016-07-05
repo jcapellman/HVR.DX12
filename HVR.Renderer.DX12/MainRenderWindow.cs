@@ -19,7 +19,8 @@ namespace HVR.Renderer.DX12 {
     public class MainRenderWindow : IRenderer {
         private LevelContainerItem _level;
         private ConfigHelper _cfgHelper;
-
+        private StopWatchHelper _stopWatch = new StopWatchHelper();
+        
         private DescriptorHeap shaderRenderViewHeap;
         private Resource vertexBuffer; 
         private VertexBufferView vertexBufferView;
@@ -28,6 +29,14 @@ namespace HVR.Renderer.DX12 {
         private ViewportF viewport;
         private Rectangle scissorRect;
         private Resource texture;
+
+        private float _frameAccumulator;
+        private int _frameCount;
+
+        const int TextureWidth = 256;
+        const int TextureHeight = 256;
+        const int TexturePixelSize = 4;	// The number of bytes used to represent a pixel in the texture.
+
 
         public const int ComponentMappingMask = 0x7;
 
@@ -52,15 +61,21 @@ namespace HVR.Renderer.DX12 {
             return ((Mapping >> (ComponentMappingShift * ComponentToExtract) & ComponentMappingMask));
         }
         
-        public void Initialize(RenderForm form, Adapter selectedAdapter, LevelContainerItem level, ConfigHelper cfgHelper) {
+        public void Initialize(ref RenderForm form, Adapter selectedAdapter, LevelContainerItem level, ConfigHelper cfgHelper) {
             _level = level;
             _cfgHelper = cfgHelper;
+
+            _stopWatch.Start();
 
             LoadPipeline(form, selectedAdapter);
             LoadAssets();
         }
 
+        private RenderForm _form;
+
         private void LoadPipeline(RenderForm form, Adapter selectedAdapter) {
+            _form = form;
+
             int width = form.ClientSize.Width;
             int height = form.ClientSize.Height;
 
@@ -83,20 +98,17 @@ namespace HVR.Renderer.DX12 {
                 CommandQueueDescription queueDesc = new CommandQueueDescription(CommandListType.Direct);
                 commandQueue = device.CreateCommandQueue(queueDesc);
 
-
-                // Describe and create the swap chain.
-                SwapChainDescription swapChainDesc = new SwapChainDescription() {
+                var swapChainDesc = new SwapChainDescription() {
                     BufferCount = FrameCount,
                     ModeDescription = new ModeDescription(width, height, new Rational(60, 1), Format.R8G8B8A8_UNorm),
                     Usage = Usage.RenderTargetOutput,
                     SwapEffect = SwapEffect.FlipDiscard,
                     OutputHandle = form.Handle,
-                    //Flags = SwapChainFlags.None,
-                    SampleDescription = new SampleDescription(_cfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE), 0),
+                    SampleDescription = new SampleDescription(1, 0),
                     IsWindowed = true
                 };
 
-                SwapChain tempSwapChain = new SwapChain(factory, commandQueue, swapChainDesc);
+                var tempSwapChain = new SwapChain(factory, commandQueue, swapChainDesc);
                 swapChain = tempSwapChain.QueryInterface<SwapChain3>();
                 tempSwapChain.Dispose();
                 frameIndex = swapChain.CurrentBackBufferIndex;
@@ -104,7 +116,7 @@ namespace HVR.Renderer.DX12 {
 
             // Create descriptor heaps.
             // Describe and create a render target view (RTV) descriptor heap.
-            DescriptorHeapDescription rtvHeapDesc = new DescriptorHeapDescription() {
+            var rtvHeapDesc = new DescriptorHeapDescription() {
                 DescriptorCount = FrameCount,
                 Flags = DescriptorHeapFlags.None,
                 Type = DescriptorHeapType.RenderTargetView
@@ -123,7 +135,7 @@ namespace HVR.Renderer.DX12 {
             rtvDescriptorSize = device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
 
             // Create frame resources.
-            CpuDescriptorHandle rtvHandle = renderTargetViewHeap.CPUDescriptorHandleForHeapStart;
+            var rtvHandle = renderTargetViewHeap.CPUDescriptorHandleForHeapStart;
             for (int n = 0; n < FrameCount; n++) {
                 renderTargets[n] = swapChain.GetBackBuffer<Resource>(n);
                 device.CreateRenderTargetView(renderTargets[n], null, rtvHandle);
@@ -131,6 +143,7 @@ namespace HVR.Renderer.DX12 {
             }
 
             commandAllocator = device.CreateCommandAllocator(CommandListType.Direct);
+           
         }
 
         private void LoadAssets() {
@@ -169,7 +182,6 @@ namespace HVR.Renderer.DX12 {
                     new InputElement("TEXCOORD",0,Format.R32G32_Float,12,0)
             };
 
-            // Describe and create the graphics pipeline state object (PSO).
             var psoDesc = new GraphicsPipelineStateDescription() {
                 InputLayout = new InputLayoutDescription(inputElementDescs),
                 RootSignature = rootSignature,
@@ -186,8 +198,9 @@ namespace HVR.Renderer.DX12 {
                 SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0),
                 StreamOutput = new StreamOutputDescription()
             };
-            psoDesc.RenderTargetFormats[0] = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
 
+            psoDesc.RenderTargetFormats[0] = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
+            
             pipelineState = device.CreateGraphicsPipelineState(psoDesc);
 
             commandList = device.CreateCommandList(CommandListType.Direct, commandAllocator, pipelineState);
@@ -205,19 +218,19 @@ namespace HVR.Renderer.DX12 {
             vertexBufferView.StrideInBytes = Utilities.SizeOf<LevelGeometryItem>();
             vertexBufferView.SizeInBytes = vertexBufferSize;
 
-            var textureData = File.ReadAllBytes(PathHelper.GetPath(Common.Enums.ResourceTypes.Textures, "Walls/Sil.png"));
-
-            var textureDesc = ResourceDescription.Texture2D(Format.R8G8B8A8_UNorm, 512, 512);
+            var textureDesc = ResourceDescription.Texture2D(Format.R8G8B8A8_UNorm, TextureWidth, TextureHeight);
             texture = device.CreateCommittedResource(new HeapProperties(HeapType.Default), HeapFlags.None, textureDesc, ResourceStates.CopyDestination);
 
             long uploadBufferSize = GetRequiredIntermediateSize(this.texture, 0, 1);
 
             // Create the GPU upload buffer.
-            var textureUploadHeap = device.CreateCommittedResource(new HeapProperties(CpuPageProperty.WriteBack, MemoryPool.L0), HeapFlags.None, ResourceDescription.Texture2D(Format.R8G8B8A8_UNorm, 512, 512), ResourceStates.GenericRead);
+            var textureUploadHeap = device.CreateCommittedResource(new HeapProperties(CpuPageProperty.WriteBack, MemoryPool.L0), HeapFlags.None, ResourceDescription.Texture2D(Format.R8G8B8A8_UNorm, TextureWidth, TextureHeight), ResourceStates.GenericRead);
+
+            var textureData = GenerateTextureData();
             
             var handle = GCHandle.Alloc(textureData, GCHandleType.Pinned);
             var ptr = Marshal.UnsafeAddrOfPinnedArrayElement(textureData, 0);
-            textureUploadHeap.WriteToSubresource(0, null, ptr, 4 * 512, textureData.Length);
+         //   textureUploadHeap.WriteToSubresource(0, null, ptr, TexturePixelSize * TextureWidth, textureData.Length);
             handle.Free();
 
             commandList.CopyTextureRegion(new TextureCopyLocation(texture, 0), 0, 0, 0, new TextureCopyLocation(textureUploadHeap, 0), null);
@@ -244,6 +257,35 @@ namespace HVR.Renderer.DX12 {
             textureUploadHeap.Dispose();
         }
 
+        byte[] GenerateTextureData() {
+            int rowPitch = TextureWidth * TexturePixelSize;
+            int cellPitch = rowPitch >> 3;       // The width of a cell in the checkboard texture.
+            int cellHeight = TextureWidth >> 3;  // The height of a cell in the checkerboard texture.
+            int textureSize = rowPitch * TextureHeight;
+            byte[] data = new byte[textureSize];
+
+            for (int n = 0; n < textureSize; n += TexturePixelSize) {
+                int x = n % rowPitch;
+                int y = n / rowPitch;
+                int i = x / cellPitch;
+                int j = y / cellHeight;
+
+                if (i % 2 == j % 2) {
+                    data[n] = 0x00;     // R
+                    data[n + 1] = 0x00; // G
+                    data[n + 2] = 0x00; // B
+                    data[n + 3] = 0xff; // A
+                } else {
+                    data[n] = 0xff;     // R
+                    data[n + 1] = 0xff; // G
+                    data[n + 2] = 0xff; // B
+                    data[n + 3] = 0xff; // A
+                }
+            }
+
+            return data;
+        }
+
         private long GetRequiredIntermediateSize(Resource destinationResource, int firstSubresource, int NumSubresources) {
             var desc = destinationResource.Description;
             long requiredSize;
@@ -262,28 +304,36 @@ namespace HVR.Renderer.DX12 {
             // re-recording.
             commandList.Reset(commandAllocator, pipelineState);
 
+
+            // Set necessary state.
             commandList.SetGraphicsRootSignature(rootSignature);
+
+            commandList.SetDescriptorHeaps(1, new DescriptorHeap[] { shaderRenderViewHeap });
+
+            commandList.SetGraphicsRootDescriptorTable(0, shaderRenderViewHeap.GPUDescriptorHandleForHeapStart);
+
             commandList.SetViewport(viewport);
             commandList.SetScissorRectangles(scissorRect);
-            
+
             // Indicate that the back buffer will be used as a render target.
-            commandList.ResourceBarrierTransition(renderTargets[frameIndex], ResourceStates.Present,
-                ResourceStates.RenderTarget);
+            commandList.ResourceBarrierTransition(renderTargets[frameIndex], ResourceStates.Present, ResourceStates.RenderTarget);
 
             var rtvHandle = renderTargetViewHeap.CPUDescriptorHandleForHeapStart;
             rtvHandle += frameIndex * rtvDescriptorSize;
             commandList.SetRenderTargets(rtvHandle, null);
 
-            commandList.ClearRenderTargetView(rtvHandle, new Color4(0, 0.0F, 0.0f, 1), 0, null);
+            // Record commands.
+            commandList.ClearRenderTargetView(rtvHandle, new Color4(0, 0.2F, 0.4f, 1), 0, null);
 
             commandList.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
             commandList.SetVertexBuffer(0, vertexBufferView);
             commandList.DrawInstanced(3, 1, 0, 0);
 
-
+            // Indicate that the back buffer will now be used to present.
             commandList.ResourceBarrierTransition(renderTargets[frameIndex], ResourceStates.RenderTarget, ResourceStates.Present);
 
             commandList.Close();
+
         }
 
         /// <summary> 
@@ -307,15 +357,34 @@ namespace HVR.Renderer.DX12 {
         }
 
         public void Update() {
+            FrameDelta = (float)_stopWatch.Update();
+        }
+
+        public float FrameDelta { get; private set; }
+        
+        public float FramePerSecond { get; private set; }
+
+        private void CalculateFPS() {
+            _frameAccumulator += FrameDelta;
+            ++_frameCount;
+            if (_frameAccumulator >= 1.0f) {
+                FramePerSecond = _frameCount / _frameAccumulator;
+
+                _form.Text = Common.Constants.GAME_NAME + " - FPS: " + Math.Round(FramePerSecond, 0);
+                _frameAccumulator = 0.0f;
+                _frameCount = 0;
+            }
         }
 
         public void Render() {
+            CalculateFPS();
+
             // Record all the commands we need to render the scene into the command list.
             PopulateCommandList();
 
             // Execute the command list.
             commandQueue.ExecuteCommandList(commandList);
-
+            
             // Present the frame.
             swapChain.Present(1, 0);
 

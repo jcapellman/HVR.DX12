@@ -77,6 +77,7 @@
     <Compile Include="Helpers\ConfigHelper.cs" />
     <Compile Include="Helpers\LevelLoaderHelper.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
+    <Compile Include="Helpers\StopWatchHelper.cs" />
     <Compile Include="Interfaces\IRenderer.cs" />
     <Compile Include="Interfaces\ISoundRenderer.cs" />
     <Compile Include="Objects\Game\Level\LevelContainerItem.cs" />
