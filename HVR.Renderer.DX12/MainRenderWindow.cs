@@ -51,25 +51,26 @@ namespace HVR.Renderer.DX12 {
         private Fence fence;
         private int fenceValue;
         
+        public event EventHandler OnClose;
+
         public void Initialize(ref RenderForm form, Adapter selectedAdapter, LevelContainerItem level, ConfigHelper cfgHelper) {
             _level = level;
             _cfgHelper = cfgHelper;
+            _form = form;
 
             _enableFPSCounter = cfgHelper.GetConfigOption(Common.Enums.ConfigOptions.ENABLE_FPS_COUNTER);
 
             if (_enableFPSCounter) {
                 _fpsCounter.Start();
             }
-
-            LoadPipeline(form, selectedAdapter);
+            
+            LoadPipeline(selectedAdapter);
             LoadAssets();
         }
         
-        private void LoadPipeline(RenderForm form, Adapter selectedAdapter) {
-            _form = form;
-
-            int width = form.ClientSize.Width;
-            int height = form.ClientSize.Height;
+        private void LoadPipeline(Adapter selectedAdapter) {
+            int width = _form.ClientSize.Width;
+            int height = _form.ClientSize.Height;
 
             viewport.Width = width;
             viewport.Height = height;
@@ -95,7 +96,7 @@ namespace HVR.Renderer.DX12 {
                     ModeDescription = new ModeDescription(width, height, new Rational(60, 1), Format.R8G8B8A8_UNorm),
                     Usage = Usage.RenderTargetOutput,
                     SwapEffect = SwapEffect.FlipDiscard,
-                    OutputHandle = form.Handle,
+                    OutputHandle = _form.Handle,
                     SampleDescription = new SampleDescription(1, 0),
                     IsWindowed = true
                 };
@@ -243,7 +244,7 @@ namespace HVR.Renderer.DX12 {
 
             commandList.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
             commandList.SetVertexBuffer(0, vertexBufferView);
-            commandList.DrawInstanced(3, 1, 0, 0);
+            commandList.DrawInstanced(_level.Geometry.Length, 1, 0, 0);
 
             commandList.ResourceBarrierTransition(renderTargets[frameIndex], ResourceStates.RenderTarget, ResourceStates.Present);
 
@@ -295,6 +296,8 @@ namespace HVR.Renderer.DX12 {
             fence.Dispose();
             swapChain.Dispose();
             device.Dispose();
+
+            OnClose(this, null);
         }
     }
 }

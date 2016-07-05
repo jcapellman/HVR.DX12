@@ -49,6 +49,7 @@ namespace HVR {
             form.Show();
 
             using (var app = new HVR.Renderer.DX12.MainRenderWindow()) {
+                app.OnClose += App_OnClose;
                 app.Initialize(ref form, viewModel.SelectedAdapter.DXAdapter, level, App.CfgHelper);
 
                 using (var loop = new RenderLoop(form)) {
@@ -58,6 +59,10 @@ namespace HVR {
                     }
                 }
             }
+        }
+
+        private void App_OnClose(object sender, System.EventArgs e) {
+            Show();
         }
 
         private void btnLaunch_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) {
