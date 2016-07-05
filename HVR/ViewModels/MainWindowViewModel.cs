@@ -39,6 +39,13 @@ namespace HVR.ViewModels {
             set { _adapters = value; OnPropertyChanged(); }
         }
 
+        private bool _enableFPSCounter;
+
+        public bool EnableFPSCounter {
+            get { return _enableFPSCounter; }
+            set { _enableFPSCounter = value;  OnPropertyChanged(); }
+        }
+
         private AdapterListingItem _selectedAdapter;
 
         private ObservableCollection<int> _multiSamplingValues;
@@ -65,6 +72,7 @@ namespace HVR.ViewModels {
             App.CfgHelper.SetConfigOption(Common.Enums.ConfigOptions.SELECTED_FULLSCREEN, IsFullscreen);
             App.CfgHelper.SetConfigOption(Common.Enums.ConfigOptions.SELECTED_RESOLUTION, SelectedScreenResolution.Display);
             App.CfgHelper.SetConfigOption(Common.Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE, SelectedMultiSample);
+            App.CfgHelper.SetConfigOption(Common.Enums.ConfigOptions.ENABLE_FPS_COUNTER, EnableFPSCounter);
 
             App.CfgHelper.WriteConfig();
         }
@@ -102,6 +110,7 @@ namespace HVR.ViewModels {
 
         public void LoadData() {
             IsFullscreen = App.CfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_FULLSCREEN);
+            EnableFPSCounter = App.CfgHelper.GetConfigOption(Common.Enums.ConfigOptions.ENABLE_FPS_COUNTER);
             SelectedMultiSample = App.CfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_MULTISAMPLE_VALUE);
 
             MutliSamplingValues.Add(1);

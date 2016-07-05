@@ -38,6 +38,8 @@ namespace HVR.Common.Helpers {
                     return "1280x720";
                 case ConfigOptions.SELECTED_MULTISAMPLE_VALUE:
                     return 4;
+                case ConfigOptions.ENABLE_FPS_COUNTER:
+                    return true;
             }
 
             return null;
@@ -55,6 +57,7 @@ namespace HVR.Common.Helpers {
             switch (configOption) {
                 case ConfigOptions.SELECTED_RESOLUTION:
                     return _configData[configOption];
+                case ConfigOptions.ENABLE_FPS_COUNTER:
                 case ConfigOptions.SELECTED_FULLSCREEN:
                     return Convert.ToBoolean(_configData[configOption]);
                 case ConfigOptions.SELECTED_MULTISAMPLE_VALUE:

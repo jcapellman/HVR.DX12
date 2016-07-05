@@ -20,7 +20,9 @@ namespace HVR.Renderer.DX12 {
         private LevelContainerItem _level;
         private ConfigHelper _cfgHelper;
         private StopWatchHelper _stopWatch = new StopWatchHelper();
-        
+
+        private bool _enableFPSCounter = true;
+
         private DescriptorHeap shaderRenderViewHeap;
         private Resource vertexBuffer; 
         private VertexBufferView vertexBufferView;
@@ -65,7 +67,11 @@ namespace HVR.Renderer.DX12 {
             _level = level;
             _cfgHelper = cfgHelper;
 
-            _stopWatch.Start();
+            _enableFPSCounter = cfgHelper.GetConfigOption(Common.Enums.ConfigOptions.ENABLE_FPS_COUNTER);
+
+            if (_enableFPSCounter) {
+                _stopWatch.Start();
+            }
 
             LoadPipeline(form, selectedAdapter);
             LoadAssets();
@@ -377,7 +383,9 @@ namespace HVR.Renderer.DX12 {
         }
 
         public void Render() {
-            CalculateFPS();
+            if (_enableFPSCounter) {
+                CalculateFPS();
+            }
 
             // Record all the commands we need to render the scene into the command list.
             PopulateCommandList();
