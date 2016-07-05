@@ -52,6 +52,11 @@ namespace HVR.SoundRenderer.DX12 {
 
         void IDisposable.Dispose() {
             _masteringVoice.Dispose();
+
+            foreach (var item in _cachedSounds) {
+                item.Value.Dispose();
+            }
+
             _xaudio2.Dispose();
         }
     }

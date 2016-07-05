@@ -17,10 +17,13 @@ namespace HVR.Renderer.DX12 {
         private LevelContainerItem _level;
         private ConfigHelper _cfgHelper;
 
-        /// <summary>
-        /// Initialise pipeline and assets
-        /// </summary>
-        /// <param name="form">The form</param>
+        private Resource vertexBuffer; 
+        private VertexBufferView vertexBufferView;
+        private RootSignature rootSignature;
+        private PipelineState pipelineState;
+        private ViewportF viewport;
+        private Rectangle scissorRect;
+        
         public void Initialize(RenderForm form, Adapter selectedAdapter, LevelContainerItem level, ConfigHelper cfgHelper) {
             _level = level;
             _cfgHelper = cfgHelper;
@@ -32,6 +35,13 @@ namespace HVR.Renderer.DX12 {
         private void LoadPipeline(RenderForm form, Adapter selectedAdapter) {
             int width = form.ClientSize.Width;
             int height = form.ClientSize.Height;
+
+            viewport.Width = width;
+            viewport.Height = height;
+            viewport.MaxDepth = 1.0f;
+
+            scissorRect.Right = width;
+            scissorRect.Bottom = height;
 
 #if DEBUG
             // Enable the D3D12 debug layer.
@@ -88,18 +98,59 @@ namespace HVR.Renderer.DX12 {
         }
 
         private void LoadAssets() {
-            // Create the command list.
-            commandList = device.CreateCommandList(CommandListType.Direct, commandAllocator, null);
+            var rootSignatureDesc = new RootSignatureDescription(RootSignatureFlags.AllowInputAssemblerInputLayout);
+            rootSignature = device.CreateRootSignature(rootSignatureDesc.Serialize());
+            
+            var vertexShader = new ShaderBytecode(SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(PathHelper.GetPath(Common.Enums.ResourceTypes.Shaders, "vs_color.hlsl"), "VSMain", "vs_5_0", SharpDX.D3DCompiler.ShaderFlags.Debug));
+            var pixelShader = new ShaderBytecode(SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(PathHelper.GetPath(Common.Enums.ResourceTypes.Shaders, "ps_color.hlsl"), "PSMain", "ps_5_0", SharpDX.D3DCompiler.ShaderFlags.Debug));
 
-            // Command lists are created in the recording state, but there is nothing
-            // to record yet. The main loop expects it to be closed, so close it now.
+            var inputElementDescs = new[]             {
+                     new InputElement("POSITION",0,Format.R32G32B32_Float,0,0),
+                     new InputElement("COLOR",0,Format.R32G32B32A32_Float,12,0)
+             };
+
+            // Describe and create the graphics pipeline state object (PSO). 
+             var psoDesc = new GraphicsPipelineStateDescription()
+             {
+                                 InputLayout = new InputLayoutDescription(inputElementDescs), 
+                 RootSignature = rootSignature, 
+                 VertexShader = vertexShader, 
+                 PixelShader = pixelShader, 
+                 RasterizerState = RasterizerStateDescription.Default(), 
+                 BlendState = BlendStateDescription.Default(), 
+                 DepthStencilFormat = SharpDX.DXGI.Format.D32_Float, 
+                 DepthStencilState = new DepthStencilStateDescription() { IsDepthEnabled = false, IsStencilEnabled = false }, 
+                 SampleMask = int.MaxValue, 
+                 PrimitiveTopologyType = PrimitiveTopologyType.Triangle, 
+                 RenderTargetCount = 1, 
+                 Flags = PipelineStateFlags.None, 
+                 SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0), 
+                 StreamOutput = new StreamOutputDescription()
+             };
+
+            psoDesc.RenderTargetFormats[0] = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
+            pipelineState = device.CreateGraphicsPipelineState(psoDesc);
+
+            commandList = device.CreateCommandList(CommandListType.Direct, commandAllocator, pipelineState);
+            
+            int vertexBufferSize = Utilities.SizeOf(_level.Geometry);
+            
+            vertexBuffer = device.CreateCommittedResource(new HeapProperties(HeapType.Upload), HeapFlags.None, ResourceDescription.Buffer(vertexBufferSize), ResourceStates.GenericRead);
+
+            IntPtr pVertexDataBegin = vertexBuffer.Map(0);
+            Utilities.Write(pVertexDataBegin, _level.Geometry, 0, _level.Geometry.Length);
+            vertexBuffer.Unmap(0);
+
+            vertexBufferView = new VertexBufferView();
+            vertexBufferView.BufferLocation = vertexBuffer.GPUVirtualAddress;
+            vertexBufferView.StrideInBytes = Utilities.SizeOf<LevelGeometryItem>();
+            vertexBufferView.SizeInBytes = vertexBufferSize;
+            
             commandList.Close();
-
-            // Create synchronization objects.
+            
             fence = device.CreateFence(0, FenceFlags.None);
             fenceValue = 1;
-
-            // Create an event handle to use for frame synchronization.
+            
             fenceEvent = new AutoResetEvent(false);
         }
 
@@ -112,26 +163,28 @@ namespace HVR.Renderer.DX12 {
             // However, when ExecuteCommandList() is called on a particular command 
             // list, that command list can then be reset at any time and must be before 
             // re-recording.
-            commandList.Reset(commandAllocator, null);
+            commandList.Reset(commandAllocator, pipelineState);
 
+            commandList.SetGraphicsRootSignature(rootSignature);
+            commandList.SetViewport(viewport);
+            commandList.SetScissorRectangles(scissorRect);
+            
             // Indicate that the back buffer will be used as a render target.
             commandList.ResourceBarrierTransition(renderTargets[frameIndex], ResourceStates.Present,
                 ResourceStates.RenderTarget);
 
-            CpuDescriptorHandle rtvHandle = renderTargetViewHeap.CPUDescriptorHandleForHeapStart;
+            var rtvHandle = renderTargetViewHeap.CPUDescriptorHandleForHeapStart;
             rtvHandle += frameIndex * rtvDescriptorSize;
+            commandList.SetRenderTargets(rtvHandle, null);
 
-            // Record commands.
+            commandList.ClearRenderTargetView(rtvHandle, new Color4(0, 0.0F, 0.0f, 1), 0, null);
 
-            var color = (frameIndex % 100 == 0 ? 0.35f : 0.0f);
+            commandList.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+            commandList.SetVertexBuffer(0, vertexBufferView);
+            commandList.DrawInstanced(3, 1, 0, 0);
 
-            commandList.ClearRenderTargetView(rtvHandle, new Color4(color, color, color, 1), 0, null);
-            
-            // Indicate that the back buffer will now be used to present.
-            commandList.ResourceBarrierTransition(renderTargets[frameIndex], ResourceStates.RenderTarget,
-                ResourceStates.Present);
 
-            
+            commandList.ResourceBarrierTransition(renderTargets[frameIndex], ResourceStates.RenderTarget, ResourceStates.Present);
 
             commandList.Close();
         }

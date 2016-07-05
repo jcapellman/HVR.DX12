@@ -1,15 +1,9 @@
 ﻿using SharpDX;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HVR.Common.Objects.Game.Level {
-    public class LevelGeometryItem {
-        public List<LevelVertexItem> Vertices { get; set; }
+    public struct LevelGeometryItem {
+        public Vector3 Vector { get; set; }
 
-        public Color Color { get; set; }
+        public Vector4 Color { get; set; }
     }
 }

@@ -62,7 +62,7 @@ namespace HVR {
 
         private void btnLaunch_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e) {
             var sndItem = new SoundItem {
-                FileName = Common.Helpers.PathHelper.GetPath(Common.Enums.ResourceTypes.Sound, "Atmospheric/breathing.wav")
+                FileName = Common.Helpers.PathHelper.GetPath(Common.Enums.ResourceTypes.Sounds, "Atmospheric/breathing.wav")
             };
             
             sndRenderer.Play(sndItem);

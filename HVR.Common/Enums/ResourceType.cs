@@ -1,7 +1,8 @@
 ﻿namespace HVR.Common.Enums {
     public enum ResourceTypes {
-        Sound,
+        Sounds,
         Textures,
-        Levels
+        Levels,
+        Shaders
     }
 }
