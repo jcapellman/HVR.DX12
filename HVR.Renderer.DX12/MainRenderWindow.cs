@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Windows.Forms;
 
 using SharpDX;
 using SharpDX.Windows;
@@ -63,7 +64,13 @@ namespace HVR.Renderer.DX12 {
             if (_enableFPSCounter) {
                 _fpsCounter.Start();
             }
-            
+
+            form.KeyUp += (sender, args) => {
+                if (args.KeyCode == Keys.Escape) {
+                    _form.Close();
+                }
+            };
+
             LoadPipeline(selectedAdapter);
             LoadAssets();
         }
@@ -163,8 +170,7 @@ namespace HVR.Renderer.DX12 {
                 });
 
             rootSignature = device.CreateRootSignature(0, rootSignatureDesc.Serialize());
-
-
+            
             var vertexShader = new ShaderBytecode(SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(PathHelper.GetPath(Common.Enums.ResourceTypes.Shaders, "vs_color.hlsl"), "VSMain", "vs_5_0", SharpDX.D3DCompiler.ShaderFlags.Debug));
             var pixelShader = new ShaderBytecode(SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(PathHelper.GetPath(Common.Enums.ResourceTypes.Shaders, "ps_color.hlsl"), "PSMain", "ps_5_0", SharpDX.D3DCompiler.ShaderFlags.Debug));
 
