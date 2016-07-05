@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+
 using System.Threading;
 using SharpDX;
 using SharpDX.Windows;
@@ -11,18 +13,44 @@ using HVR.Common.Objects.Game.Level;
 
 using HVR.Common.Interfaces;
 using HVR.Common.Helpers;
+using System.Runtime.InteropServices;
 
 namespace HVR.Renderer.DX12 {
     public class MainRenderWindow : IRenderer {
         private LevelContainerItem _level;
         private ConfigHelper _cfgHelper;
 
+        private DescriptorHeap shaderRenderViewHeap;
         private Resource vertexBuffer; 
         private VertexBufferView vertexBufferView;
         private RootSignature rootSignature;
         private PipelineState pipelineState;
         private ViewportF viewport;
         private Rectangle scissorRect;
+        private Resource texture;
+
+        public const int ComponentMappingMask = 0x7;
+
+        public const int ComponentMappingShift = 3;
+
+        public const int ComponentMappingAlwaysSetBitAvoidingZeromemMistakes = (1 << (ComponentMappingShift * 4));
+
+        public int ComponentMapping(int src0, int src1, int src2, int src3) {
+
+            return ((((src0) & ComponentMappingMask) |
+            (((src1) & ComponentMappingMask) << ComponentMappingShift) |
+                                                                (((src2) & ComponentMappingMask) << (ComponentMappingShift * 2)) |
+                                                                (((src3) & ComponentMappingMask) << (ComponentMappingShift * 3)) |
+                                                                ComponentMappingAlwaysSetBitAvoidingZeromemMistakes));
+        }
+
+        public int DefaultComponentMapping() {
+            return ComponentMapping(0, 1, 2, 3);
+        }
+
+        public int ComponentMapping(int ComponentToExtract, int Mapping) {
+            return ((Mapping >> (ComponentMappingShift * ComponentToExtract) & ComponentMappingMask));
+        }
         
         public void Initialize(RenderForm form, Adapter selectedAdapter, LevelContainerItem level, ConfigHelper cfgHelper) {
             _level = level;
@@ -84,6 +112,14 @@ namespace HVR.Renderer.DX12 {
 
             renderTargetViewHeap = device.CreateDescriptorHeap(rtvHeapDesc);
 
+            var srvHeapDesc = new DescriptorHeapDescription() {
+                DescriptorCount = 1,
+                Flags = DescriptorHeapFlags.ShaderVisible,
+                Type = DescriptorHeapType.ConstantBufferViewShaderResourceViewUnorderedAccessView
+            };
+
+            shaderRenderViewHeap = device.CreateDescriptorHeap(srvHeapDesc);
+
             rtvDescriptorSize = device.GetDescriptorHandleIncrementSize(DescriptorHeapType.RenderTargetView);
 
             // Create frame resources.
@@ -98,37 +134,60 @@ namespace HVR.Renderer.DX12 {
         }
 
         private void LoadAssets() {
-            var rootSignatureDesc = new RootSignatureDescription(RootSignatureFlags.AllowInputAssemblerInputLayout);
-            rootSignature = device.CreateRootSignature(rootSignatureDesc.Serialize());
-            
+            var rootSignatureDesc = new RootSignatureDescription(RootSignatureFlags.AllowInputAssemblerInputLayout,
+                // Root Parameters
+                new[]
+                {
+                    new RootParameter(ShaderVisibility.Pixel,
+                        new DescriptorRange()
+                        {
+                            RangeType = DescriptorRangeType.ShaderResourceView,
+                            DescriptorCount = 1,
+                            OffsetInDescriptorsFromTableStart = int.MinValue,
+                            BaseShaderRegister = 0
+                        })
+                },
+                // Samplers
+                new[]
+                {
+                    new StaticSamplerDescription(ShaderVisibility.Pixel, 0, 0)
+                    {
+                        Filter = Filter.MinimumMinMagMipPoint,
+                        AddressUVW = TextureAddressMode.Border,
+                    }
+                });
+
+            rootSignature = device.CreateRootSignature(0, rootSignatureDesc.Serialize());
+
+
             var vertexShader = new ShaderBytecode(SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(PathHelper.GetPath(Common.Enums.ResourceTypes.Shaders, "vs_color.hlsl"), "VSMain", "vs_5_0", SharpDX.D3DCompiler.ShaderFlags.Debug));
             var pixelShader = new ShaderBytecode(SharpDX.D3DCompiler.ShaderBytecode.CompileFromFile(PathHelper.GetPath(Common.Enums.ResourceTypes.Shaders, "ps_color.hlsl"), "PSMain", "ps_5_0", SharpDX.D3DCompiler.ShaderFlags.Debug));
 
-            var inputElementDescs = new[]             {
-                     new InputElement("POSITION",0,Format.R32G32B32_Float,0,0),
-                     new InputElement("COLOR",0,Format.R32G32B32A32_Float,12,0)
-             };
+            var inputElementDescs = new[]
+            {
+                    new InputElement("POSITION",0,Format.R32G32B32_Float,0,0),
+                    new InputElement("TEXCOORD",0,Format.R32G32_Float,12,0)
+            };
 
-            // Describe and create the graphics pipeline state object (PSO). 
-             var psoDesc = new GraphicsPipelineStateDescription()
-             {
-                                 InputLayout = new InputLayoutDescription(inputElementDescs), 
-                 RootSignature = rootSignature, 
-                 VertexShader = vertexShader, 
-                 PixelShader = pixelShader, 
-                 RasterizerState = RasterizerStateDescription.Default(), 
-                 BlendState = BlendStateDescription.Default(), 
-                 DepthStencilFormat = SharpDX.DXGI.Format.D32_Float, 
-                 DepthStencilState = new DepthStencilStateDescription() { IsDepthEnabled = false, IsStencilEnabled = false }, 
-                 SampleMask = int.MaxValue, 
-                 PrimitiveTopologyType = PrimitiveTopologyType.Triangle, 
-                 RenderTargetCount = 1, 
-                 Flags = PipelineStateFlags.None, 
-                 SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0), 
-                 StreamOutput = new StreamOutputDescription()
-             };
-
+            // Describe and create the graphics pipeline state object (PSO).
+            var psoDesc = new GraphicsPipelineStateDescription() {
+                InputLayout = new InputLayoutDescription(inputElementDescs),
+                RootSignature = rootSignature,
+                VertexShader = vertexShader,
+                PixelShader = pixelShader,
+                RasterizerState = RasterizerStateDescription.Default(),
+                BlendState = BlendStateDescription.Default(),
+                DepthStencilFormat = SharpDX.DXGI.Format.D32_Float,
+                DepthStencilState = new DepthStencilStateDescription() { IsDepthEnabled = false, IsStencilEnabled = false },
+                SampleMask = int.MaxValue,
+                PrimitiveTopologyType = PrimitiveTopologyType.Triangle,
+                RenderTargetCount = 1,
+                Flags = PipelineStateFlags.None,
+                SampleDescription = new SharpDX.DXGI.SampleDescription(1, 0),
+                StreamOutput = new StreamOutputDescription()
+            };
             psoDesc.RenderTargetFormats[0] = SharpDX.DXGI.Format.R8G8B8A8_UNorm;
+
             pipelineState = device.CreateGraphicsPipelineState(psoDesc);
 
             commandList = device.CreateCommandList(CommandListType.Direct, commandAllocator, pipelineState);
@@ -145,13 +204,51 @@ namespace HVR.Renderer.DX12 {
             vertexBufferView.BufferLocation = vertexBuffer.GPUVirtualAddress;
             vertexBufferView.StrideInBytes = Utilities.SizeOf<LevelGeometryItem>();
             vertexBufferView.SizeInBytes = vertexBufferSize;
+
+            var textureData = File.ReadAllBytes(PathHelper.GetPath(Common.Enums.ResourceTypes.Textures, "Walls/Sil.png"));
+
+            var textureDesc = ResourceDescription.Texture2D(Format.R8G8B8A8_UNorm, 512, 512);
+            texture = device.CreateCommittedResource(new HeapProperties(HeapType.Default), HeapFlags.None, textureDesc, ResourceStates.CopyDestination);
+
+            long uploadBufferSize = GetRequiredIntermediateSize(this.texture, 0, 1);
+
+            // Create the GPU upload buffer.
+            var textureUploadHeap = device.CreateCommittedResource(new HeapProperties(CpuPageProperty.WriteBack, MemoryPool.L0), HeapFlags.None, ResourceDescription.Texture2D(Format.R8G8B8A8_UNorm, 512, 512), ResourceStates.GenericRead);
             
+            var handle = GCHandle.Alloc(textureData, GCHandleType.Pinned);
+            var ptr = Marshal.UnsafeAddrOfPinnedArrayElement(textureData, 0);
+            textureUploadHeap.WriteToSubresource(0, null, ptr, 4 * 512, textureData.Length);
+            handle.Free();
+
+            commandList.CopyTextureRegion(new TextureCopyLocation(texture, 0), 0, 0, 0, new TextureCopyLocation(textureUploadHeap, 0), null);
+
+            commandList.ResourceBarrierTransition(this.texture, ResourceStates.CopyDestination, ResourceStates.PixelShaderResource);
+
+            // Describe and create a SRV for the texture.
+            var srvDesc = new ShaderResourceViewDescription {
+                Shader4ComponentMapping = DefaultComponentMapping(),
+                Format = textureDesc.Format,
+                Dimension = ShaderResourceViewDimension.Texture2D,
+                Texture2D = { MipLevels = 1 },
+            };
+
+            device.CreateShaderResourceView(this.texture, srvDesc, shaderRenderViewHeap.CPUDescriptorHandleForHeapStart);
+
             commandList.Close();
-            
+
             fence = device.CreateFence(0, FenceFlags.None);
             fenceValue = 1;
             
             fenceEvent = new AutoResetEvent(false);
+
+            textureUploadHeap.Dispose();
+        }
+
+        private long GetRequiredIntermediateSize(Resource destinationResource, int firstSubresource, int NumSubresources) {
+            var desc = destinationResource.Description;
+            long requiredSize;
+            device.GetCopyableFootprints(ref desc, firstSubresource, NumSubresources, 0, null, null, null, out requiredSize);
+            return requiredSize;
         }
 
         private void PopulateCommandList() {
