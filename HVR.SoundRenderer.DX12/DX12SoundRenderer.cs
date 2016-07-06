@@ -42,7 +42,7 @@ namespace HVR.SoundRenderer.DX12 {
             };
 
             var sourceVoice = new SourceVoice(_xaudio2, waveFormat, false);
-
+            
             sourceVoice.SubmitSourceBuffer(buffer, stream.DecodedPacketsInfo);
             
             sourceVoice.Start();
