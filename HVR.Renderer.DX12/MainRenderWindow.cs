@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using System.Windows.Forms;
 
 using SharpDX;
 using SharpDX.Windows;
@@ -64,13 +63,7 @@ namespace HVR.Renderer.DX12 {
             if (_enableFPSCounter) {
                 _fpsCounter.Start();
             }
-
-            form.KeyUp += (sender, args) => {
-                if (args.KeyCode == Keys.Escape) {
-                    _form.Close();
-                }
-            };
-
+            
             LoadPipeline(selectedAdapter);
             LoadAssets();
         }
