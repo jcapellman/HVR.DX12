@@ -86,6 +86,7 @@
     <Compile Include="Objects\Game\Level\LevelVertexItem.cs" />
     <Compile Include="Objects\Global\SoundItem.cs" />
     <Compile Include="Objects\Launcher\AdapterListingItem.cs" />
+    <Compile Include="Objects\Launcher\MainLoopTransportItem.cs" />
     <Compile Include="Objects\Launcher\ScreenResolutionListingItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

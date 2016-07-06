@@ -64,9 +64,9 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Button Grid.Row="0" x:Name="btnLaunch" MouseEnter="btnLaunch_MouseEnter" Background="Black" Foreground="Red" Click="btnLaunch_Click" Content="Launch Game" />
+            <Button Grid.Row="0" x:Name="btnLaunch" Background="Black" Foreground="Red" Click="btnLaunch_Click" Content="Launch Game" />
 
-            <Button Grid.Row="1" x:Name="btnQuit" MouseEnter="btnLaunch_MouseEnter" Background="Black" Foreground="Red" Click="btnQuit_Click" Margin="0,10,0,10" Content="Quit" />
+            <Button Grid.Row="1" x:Name="btnQuit" Background="Black" Foreground="Red" Click="btnQuit_Click" Margin="0,10,0,10" Content="Quit" />
         </Grid>
     </Grid>
 </controls:MetroWindow>

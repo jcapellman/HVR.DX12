@@ -32,6 +32,15 @@ namespace HVR.ViewModels {
             MutliSamplingValues = new ObservableCollection<int>();
         }
 
+        public MainLoopTransportItem GetMainLoopTransportItem() => new MainLoopTransportItem {
+            CfgHelper = App.CfgHelper,
+            DXAdapter = SelectedAdapter.DXAdapter,
+            Height = SelectedScreenResolution.Height,
+            Width = SelectedScreenResolution.Width,
+            IsFullScreen = IsFullscreen,
+            Level = Common.Helpers.LevelLoaderHelper.GetLevel("e1m1.lvl")
+        };
+
         private ObservableCollection<AdapterListingItem> _adapters;
 
         public ObservableCollection<AdapterListingItem> Adapters {
