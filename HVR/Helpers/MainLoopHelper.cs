@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using HVR.Common.Objects.Launcher;
+
 using SharpDX.Windows;
+using SharpDX.DirectInput;
 
 namespace HVR.Helpers {
     public class MainLoopHelper {
@@ -30,11 +29,27 @@ namespace HVR.Helpers {
 
                 using (var loop = new RenderLoop(_form)) {
                     while (loop.NextFrame()) {
-                        var inputs = _inputHandler.CheckInput();
+                        HandleInput(_inputHandler.CheckInput());
 
                         app.Update();
                         app.Render();
                     }
+                }
+            }
+        }
+
+        private void HandleInput(KeyboardUpdate[] pressedKeys) {
+            if (pressedKeys.Length == 0) {
+                return;
+            }
+
+            foreach (var key in pressedKeys) {
+                switch (key.Key) {
+                    case Key.Escape:
+                        _form.Close();
+
+                        OnClose(this, null);
+                        break;
                 }
             }
         }

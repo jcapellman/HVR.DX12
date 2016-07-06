@@ -19,7 +19,7 @@ namespace HVR {
         private void btnQuit_Click(object sender, RoutedEventArgs e) {
             viewModel.SaveConfig();
 
-            System.Windows.Application.Current.Shutdown();
+            Application.Current.Shutdown();
         }
 
         private void btnLaunch_Click(object sender, RoutedEventArgs e) {
