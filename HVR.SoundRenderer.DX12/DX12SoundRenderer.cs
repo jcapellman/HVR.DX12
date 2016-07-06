@@ -13,50 +13,64 @@ namespace HVR.SoundRenderer.DX12 {
         private XAudio2 _xaudio2;
         private MasteringVoice _masteringVoice;
 
-        private Dictionary<string, SourceVoice> _cachedSounds;
+        private Dictionary<string, AudioWrapper> _cachedSounds;
+
+        public struct AudioWrapper {
+            public AudioBuffer Bufffer { get; set; }
+            public WaveFormat Format { get; internal set; }
+            public uint[] PacketInfo { get; internal set; }
+        };
 
         public DX12SoundRenderer() {
             _xaudio2 = new XAudio2();
             _masteringVoice = new MasteringVoice(_xaudio2);
 
-            _cachedSounds = new Dictionary<string, SourceVoice>();
+            _cachedSounds = new Dictionary<string, AudioWrapper>();
         }
 
         public void ClearCache() {
             _cachedSounds.Clear();
         }
 
-        public void Play(SoundItem soundItem, bool cached = true, bool loop = false) {
-            if (_cachedSounds.ContainsKey(soundItem.FileName)) {
-                _cachedSounds[soundItem.FileName].Start();
-                return;
-            }
-
-            var stream = new SoundStream(File.OpenRead(soundItem.FileName));
+        private AudioWrapper getAudioWrapper(string fileName) {
+            var stream = new SoundStream(File.OpenRead(fileName));
 
             var waveFormat = stream.Format;
+
             var buffer = new AudioBuffer {
                 Stream = stream.ToDataStream(),
                 AudioBytes = (int)stream.Length,
                 Flags = BufferFlags.EndOfStream
             };
 
-            var sourceVoice = new SourceVoice(_xaudio2, waveFormat, false);
+            return new AudioWrapper {
+                Bufffer = buffer,
+                Format = waveFormat,
+                PacketInfo = stream.DecodedPacketsInfo
+            };
+        }
+
+        public void Play(SoundItem soundItem, bool cached = true, bool loop = false) {
+            AudioWrapper wrapper;
+
+            if (_cachedSounds.ContainsKey(soundItem.FileName)) {
+                wrapper = _cachedSounds[soundItem.FileName];
+            } else {
+                wrapper = getAudioWrapper(soundItem.FileName);
+
+                _cachedSounds.Add(soundItem.FileName, wrapper);
+            }
+
+            var sourceVoice = new SourceVoice(_xaudio2, wrapper.Format, false);
             
-            sourceVoice.SubmitSourceBuffer(buffer, stream.DecodedPacketsInfo);
+            sourceVoice.SubmitSourceBuffer(wrapper.Bufffer, wrapper.PacketInfo);
             
             sourceVoice.Start();
-
-            _cachedSounds.Add(soundItem.FileName, sourceVoice);
         }
 
         void IDisposable.Dispose() {
             _masteringVoice.Dispose();
-
-            foreach (var item in _cachedSounds) {
-                item.Value.Dispose();
-            }
-
+            
             _xaudio2.Dispose();
         }
     }
