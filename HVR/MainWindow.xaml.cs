@@ -14,6 +14,25 @@ namespace HVR {
             DataContext = new MainWindowViewModel();
 
             viewModel.LoadData();
+
+            ccMain.OnHide += CcMain_OnHide;
+            this.KeyUp += MainWindow_KeyUp;
+        }
+
+        private void CcMain_OnHide(object sender, System.EventArgs e) {
+            ccMain.Visibility = Visibility.Collapsed;
+        }
+
+        private void MainWindow_KeyUp(object sender, System.Windows.Input.KeyEventArgs e) {
+            if (e.Key != System.Windows.Input.Key.OemTilde) {
+                return;
+            }
+
+            if (ccMain.Visibility == Visibility.Collapsed) {
+                ccMain.Visibility = Visibility.Visible;
+            } else {
+                ccMain.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void btnQuit_Click(object sender, RoutedEventArgs e) {
