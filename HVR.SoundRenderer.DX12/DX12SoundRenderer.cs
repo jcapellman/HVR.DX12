@@ -1,12 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 using HVR.Common.Interfaces;
 using HVR.Common.Objects.Global;
 
 using SharpDX.XAudio2;
 using SharpDX.Multimedia;
-using System;
-using System.Collections.Generic;
 
 namespace HVR.SoundRenderer.DX12 {
     public class DX12SoundRenderer : ISoundRenderer {
@@ -16,7 +16,7 @@ namespace HVR.SoundRenderer.DX12 {
         private Dictionary<string, AudioWrapper> _cachedSounds;
 
         public struct AudioWrapper {
-            public AudioBuffer Bufffer { get; set; }
+            public AudioBuffer Buffer { get; set; }
             public WaveFormat Format { get; internal set; }
             public uint[] PacketInfo { get; internal set; }
         };
@@ -44,7 +44,7 @@ namespace HVR.SoundRenderer.DX12 {
             };
 
             return new AudioWrapper {
-                Bufffer = buffer,
+                Buffer = buffer,
                 Format = waveFormat,
                 PacketInfo = stream.DecodedPacketsInfo
             };
@@ -63,7 +63,7 @@ namespace HVR.SoundRenderer.DX12 {
 
             var sourceVoice = new SourceVoice(_xaudio2, wrapper.Format, false);
             
-            sourceVoice.SubmitSourceBuffer(wrapper.Bufffer, wrapper.PacketInfo);
+            sourceVoice.SubmitSourceBuffer(wrapper.Buffer, wrapper.PacketInfo);
             
             sourceVoice.Start();
         }

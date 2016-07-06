@@ -82,6 +82,7 @@
     <Compile Include="Helpers\StopWatchHelper.cs" />
     <Compile Include="Interfaces\IRenderer.cs" />
     <Compile Include="Interfaces\ISoundRenderer.cs" />
+    <Compile Include="Objects\Game\Global\BaseResourcesItem.cs" />
     <Compile Include="Objects\Game\Level\LevelContainerItem.cs" />
     <Compile Include="Objects\Game\Level\LevelGeometryItem.cs" />
     <Compile Include="Objects\Game\Level\LevelVertexItem.cs" />

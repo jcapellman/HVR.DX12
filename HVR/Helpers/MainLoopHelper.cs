@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using HVR.Common.Enums;
 using HVR.Common.Objects.Global;
 using HVR.Common.Objects.Launcher;
 using HVR.Common.Helpers;
+using HVR.Common.Objects.Game.Global;
 
 using HVR.SoundRenderer.DX12;
+
+using Newtonsoft.Json;
 
 using SharpDX.Windows;
 using SharpDX.DirectInput;
@@ -20,30 +24,28 @@ namespace HVR.Helpers {
 
         private Dictionary<CHARACTER_EVENT, SoundItem> _baseSounds;
 
-        private void LoadBaseSounds() {
+        private void LoadBaseResources() {
             _baseSounds = new Dictionary<CHARACTER_EVENT, SoundItem>();
 
-            _baseSounds.Add(CHARACTER_EVENT.WALK_FORWARD, new SoundItem {
-                FileName = PathHelper.GetPath(ResourceTypes.Sounds, "Character/Footstep01.wav")
-            });
+            var baseItems = JsonConvert.DeserializeObject<List<BaseResourceItem>>(File.ReadAllText(PathHelper.GetPath(ResourceTypes.Base, "BaseItems.json")));
 
-            _baseSounds.Add(CHARACTER_EVENT.WALK_LEFT, new SoundItem {
-                FileName = PathHelper.GetPath(ResourceTypes.Sounds, "Character/Footstep02.wav")
-            });
+            foreach (var item in baseItems) {
+                var fileName = PathHelper.GetPath(item.ResourceType, item.RelativePath);
 
-            _baseSounds.Add(CHARACTER_EVENT.WALK_BACKWARDS, new SoundItem {
-                FileName = PathHelper.GetPath(ResourceTypes.Sounds, "Character/Footstep03.wav")
-            });
-
-            _baseSounds.Add(CHARACTER_EVENT.WALK_RIGHT, new SoundItem {
-                FileName = PathHelper.GetPath(ResourceTypes.Sounds, "Character/Footstep04.wav")
-            });
+                switch (item.ResourceType) {
+                    case ResourceTypes.Sounds:
+                        _baseSounds.Add(item.CharacterEvent, new SoundItem {
+                            FileName = fileName
+                        });
+                        break;
+                }
+            }
         }
 
         public void RunLoop(MainLoopTransportItem mainLoopItem) {
             _inputHandler = new InputHandler();
 
-            LoadBaseSounds();
+            LoadBaseResources();
 
             _form = new RenderForm(Common.Constants.GAME_NAME) {
                 Width = mainLoopItem.Width,

@@ -3,6 +3,7 @@
         Sounds,
         Textures,
         Levels,
-        Shaders
+        Shaders,
+        Base
     }
 }
