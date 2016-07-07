@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -20,6 +21,10 @@ namespace HVR.ViewModels {
         public ScreenResolutionListingItem SelectedScreenResolution {
             get { return _selectedScreenResolution; }
             set { _selectedScreenResolution = value;  OnPropertyChanged(); }
+        }
+
+        internal void ApplyAction(ConsoleViewModel.CommandAction cAction) {
+            
         }
 
         private bool _isFullscreen;

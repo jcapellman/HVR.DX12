@@ -23,10 +23,34 @@ namespace HVR.ViewModels {
             set { _entry = value; OnPropertyChanged(); }
         }
 
-        public void AddEntry() {
+        public class CommandAction {
+            public string Action { get; set; }
+
+            public string Value { get; set; }
+        }
+
+        public CommandAction AddEntry() {
             ConsoleLog.Add(Entry);
 
+            var commands = Entry.Split(' ');
+
+            var action = new CommandAction();
+
+            if (commands.Length == 1) {
+                action.Action = Entry.ToUpper();
+
+                Entry = string.Empty;
+                return action;
+            }
+
+            action = new CommandAction {
+                Action = commands[0].ToUpper(),
+                Value = commands[1]
+            };
+            
             Entry = string.Empty;
+
+            return action;
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {

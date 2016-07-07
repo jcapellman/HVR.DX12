@@ -16,7 +16,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
-        <ListView Grid.Row="0" Background="Transparent" ItemsSource="{Binding ConsoleLog, Mode=TwoWay}" />
-        <TextBox Grid.Row="1" Background="Transparent" Text="{Binding Entry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Foreground="White" AcceptsReturn="True" KeyUp="TextBox_KeyUp" />
+        <ListView Grid.Row="0" Background="Transparent" VerticalAlignment="Bottom" Foreground="White" VerticalContentAlignment="Bottom" ItemsSource="{Binding ConsoleLog, Mode=TwoWay}" />
+        <TextBox Grid.Row="1" x:Name="tbMain" Background="Transparent" KeyDown="TextBox_KeyDown" Text="{Binding Entry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Foreground="White" AcceptsReturn="False" KeyUp="TextBox_KeyUp" />
     </Grid>
 </UserControl>

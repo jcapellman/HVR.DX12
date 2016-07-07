@@ -16,7 +16,18 @@ namespace HVR {
             viewModel.LoadData();
 
             ccMain.OnHide += CcMain_OnHide;
+            ccMain.OnAction += CcMain_OnAction;
+
             this.KeyUp += MainWindow_KeyUp;
+        }
+
+        private void CcMain_OnAction(object sender, System.EventArgs e) {
+            if (ccMain.CAction.Action == "QUIT") {
+                Application.Current.Shutdown();
+                return;
+            }
+
+            viewModel.ApplyAction(ccMain.CAction);
         }
 
         private void CcMain_OnHide(object sender, System.EventArgs e) {
@@ -41,9 +52,9 @@ namespace HVR {
             Application.Current.Shutdown();
         }
 
-        private void btnLaunch_Click(object sender, RoutedEventArgs e) {
+        private void LaunchLevel() {
             viewModel.SaveConfig();
-            
+
             Hide();
 
             var mainLoop = new Helpers.MainLoopHelper();
@@ -51,6 +62,10 @@ namespace HVR {
             mainLoop.OnClose += MainLoop_OnClose;
 
             mainLoop.RunLoop(viewModel.GetMainLoopTransportItem());
+        }
+
+        private void btnLaunch_Click(object sender, RoutedEventArgs e) {
+            LaunchLevel();    
         }
 
         private void MainLoop_OnClose(object sender, System.EventArgs e) {

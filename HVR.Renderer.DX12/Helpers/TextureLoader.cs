@@ -11,13 +11,13 @@ namespace HVR.Renderer.DX12.Helpers {
     public class TextureLoader {
         private SharpDX.Direct3D12.Resource texture;
 
-        const int TextureWidth = 256;
-        const int TextureHeight = 256;
-        const int TexturePixelSize = 4;	// The number of bytes used to represent a pixel in the texture.
+        const int TextureWidth = 512;
+        const int TextureHeight = 512;
+        const int TexturePixelSize = 3;	// The number of bytes used to represent a pixel in the texture.
         
         public const int ComponentMappingMask = 0x7;
 
-        public const int ComponentMappingShift = 3;
+        public const int ComponentMappingShift = 4;
 
         public const int ComponentMappingAlwaysSetBitAvoidingZeromemMistakes = (1 << (ComponentMappingShift * 4));
 
@@ -54,7 +54,7 @@ namespace HVR.Renderer.DX12.Helpers {
 
             var handle = GCHandle.Alloc(textureData, GCHandleType.Pinned);
             var ptr = Marshal.UnsafeAddrOfPinnedArrayElement(textureData, 0);
-            //   textureUploadHeap.WriteToSubresource(0, null, ptr, TexturePixelSize * TextureWidth, textureData.Length);
+          //  textureUploadHeap.WriteToSubresource(0, null, ptr, TexturePixelSize * TextureWidth, textureData.Length);
             handle.Free();
 
             commandList.CopyTextureRegion(new TextureCopyLocation(texture, 0), 0, 0, 0, new TextureCopyLocation(textureUploadHeap, 0), null);
