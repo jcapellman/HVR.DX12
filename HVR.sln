@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.25302.0
+VisualStudioVersion = 15.0.25428.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HVR", "HVR\HVR.csproj", "{DF8E15DE-FE4E-4FB2-9E0F-436E02C6A97A}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HVR.Common", "HVR.Common\HVR.Common.csproj", "{5576437F-2104-4B55-8740-3EC48FB3581B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HVR.SoundRenderer.DX12", "HVR.SoundRenderer.DX12\HVR.SoundRenderer.DX12.csproj", "{284901FC-357D-4291-ACC3-EAE8AB71BA2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HVR.Editor", "HVR.Editor\HVR.Editor.csproj", "{DC3DE0AD-D9F5-4CB7-9CE7-EFDFFA8C63B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{284901FC-357D-4291-ACC3-EAE8AB71BA2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{284901FC-357D-4291-ACC3-EAE8AB71BA2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{284901FC-357D-4291-ACC3-EAE8AB71BA2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC3DE0AD-D9F5-4CB7-9CE7-EFDFFA8C63B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC3DE0AD-D9F5-4CB7-9CE7-EFDFFA8C63B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC3DE0AD-D9F5-4CB7-9CE7-EFDFFA8C63B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC3DE0AD-D9F5-4CB7-9CE7-EFDFFA8C63B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

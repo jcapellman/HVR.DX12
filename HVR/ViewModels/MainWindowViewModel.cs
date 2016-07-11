@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -23,9 +22,7 @@ namespace HVR.ViewModels {
             set { _selectedScreenResolution = value;  OnPropertyChanged(); }
         }
 
-        internal void ApplyAction(ConsoleViewModel.CommandAction cAction) {
-            
-        }
+        internal void ApplyAction(ConsoleViewModel.CommandAction cAction) { }
 
         private bool _isFullscreen;
 
@@ -115,7 +112,7 @@ namespace HVR.ViewModels {
 
             var cfgSelectedScreenResolution = App.CfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_RESOLUTION);
 
-            if (!ScreenResolutions.Any(a => a.Display == cfgSelectedScreenResolution)) {
+            if (ScreenResolutions.All(a => a.Display != cfgSelectedScreenResolution)) {
                 SelectedScreenResolution = ScreenResolutions.FirstOrDefault();
             }
 
@@ -135,7 +132,7 @@ namespace HVR.ViewModels {
 
             var factory = new SharpDX.DXGI.Factory1();
 
-            foreach (var adapter in factory.Adapters.Where(a => a.Outputs.Count() > 0)) {
+            foreach (var adapter in factory.Adapters.Where(a => a.Outputs.Any())) {
                 Adapters.Add(new AdapterListingItem {
                     DXAdapter = adapter
                 });
@@ -143,7 +140,7 @@ namespace HVR.ViewModels {
 
             var cfgSelectedAdapter = App.CfgHelper.GetConfigOption(Common.Enums.ConfigOptions.SELECTED_ADAPTER);
 
-            if (Adapters.Any(a => a.Display != cfgSelectedAdapter) || Adapters.FirstOrDefault().Display == cfgSelectedAdapter) {
+            if (Adapters.Any(a => a.Display != cfgSelectedAdapter) || (Adapters.Any() && Adapters.FirstOrDefault().Display == cfgSelectedAdapter)) {
                 SelectedAdapter = Adapters.FirstOrDefault();
                 return;
             }
