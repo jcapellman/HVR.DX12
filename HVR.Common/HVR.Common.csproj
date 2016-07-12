@@ -74,6 +74,7 @@
     <Compile Include="Common\Constants.cs" />
     <Compile Include="Enums\CHARACTER_EVENT.cs" />
     <Compile Include="Enums\ConfigOptions.cs" />
+    <Compile Include="Enums\MapObjectTypes.cs" />
     <Compile Include="Enums\ResourceType.cs" />
     <Compile Include="Helpers\ConfigHelper.cs" />
     <Compile Include="Helpers\FPSCounterHelper.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="Helpers\StopWatchHelper.cs" />
     <Compile Include="Interfaces\IRenderer.cs" />
     <Compile Include="Interfaces\ISoundRenderer.cs" />
+    <Compile Include="Objects\Editor\MapObjectsContainerItem.cs" />
     <Compile Include="Objects\Game\Global\BaseResourcesItem.cs" />
     <Compile Include="Objects\Game\Level\LevelContainerItem.cs" />
     <Compile Include="Objects\Game\Level\LevelGeometryItem.cs" />
