@@ -1,6 +1,6 @@
 ﻿using HVR.Common.Enums;
 using HVR.Common.Objects.Editor;
-
+using HVR.Common.Objects.Game.Level;
 using Newtonsoft.Json;
 
 using System;
@@ -40,6 +40,16 @@ namespace HVR.Editor.ViewModels {
             }
         }
 
+        private LevelContainerItem _level;
+
+        public LevelContainerItem Level {
+            get { return _level; }
+            set { _level = value;  OnPropertyChanged(); }
+        }
+
+        private const int width = 32;
+        private const int height = 32;
+
         public void LoadModel() {
             SelectedMapObjectType = MapObjectTypes.PLAYER_START;
 
@@ -73,13 +83,31 @@ namespace HVR.Editor.ViewModels {
                 var jsonStr = JsonConvert.SerializeObject(objects);
 
                 File.WriteAllText("mapobjects.json", jsonStr);
+            } else {
+                var fileStr = File.ReadAllText("mapobjects.json");
 
-                return;
+                MapObjects = new ObservableCollection<MapObjectsContainerItem>(JsonConvert.DeserializeObject<List<MapObjectsContainerItem>>(fileStr));
             }
 
-            var fileStr = File.ReadAllText("mapobjects.json");
+            var level = new LevelContainerItem {
+                Geometry = new List<LevelItem>(),
+                Title = "Test"
+            };
 
-            MapObjects = new ObservableCollection<MapObjectsContainerItem>(JsonConvert.DeserializeObject<List<MapObjectsContainerItem>>(fileStr));
+            for (var x = 0; x < width; x++) {
+                for (var y = 0; y < height; y++) {
+                    var item = new LevelItem();
+
+                    item.MapObjectType = MapObjectTypes.TEXTURE;
+                    item.TextureName = @"\MBS1\Textures\Floors\Floor.png";
+                    item.X = x;
+                    item.Y = y;
+
+                    level.Geometry.Add(item);
+                }
+            }
+
+            Level = level;
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) {

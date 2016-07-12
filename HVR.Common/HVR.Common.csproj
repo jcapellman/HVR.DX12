@@ -88,6 +88,7 @@
     <Compile Include="Objects\Game\Global\BaseResourcesItem.cs" />
     <Compile Include="Objects\Game\Level\LevelContainerItem.cs" />
     <Compile Include="Objects\Game\Level\LevelGeometryItem.cs" />
+    <Compile Include="Objects\Game\Level\LevelItem.cs" />
     <Compile Include="Objects\Game\Level\LevelVertexItem.cs" />
     <Compile Include="Objects\Global\SoundItem.cs" />
     <Compile Include="Objects\Launcher\AdapterListingItem.cs" />
