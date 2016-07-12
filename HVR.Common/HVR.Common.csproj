@@ -74,6 +74,7 @@
     <Compile Include="Common\Constants.cs" />
     <Compile Include="Enums\CHARACTER_EVENT.cs" />
     <Compile Include="Enums\ConfigOptions.cs" />
+    <Compile Include="Enums\MapGeometryTypes.cs" />
     <Compile Include="Enums\MapObjectTypes.cs" />
     <Compile Include="Enums\ResourceType.cs" />
     <Compile Include="Helpers\ConfigHelper.cs" />

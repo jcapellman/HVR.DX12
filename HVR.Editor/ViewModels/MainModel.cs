@@ -44,6 +44,36 @@ namespace HVR.Editor.ViewModels {
             SelectedMapObjectType = MapObjectTypes.PLAYER_START;
 
             if (!File.Exists("mapobjects.json")) {
+                var files = Directory.GetFiles("mbs1/Textures", "*.png", SearchOption.AllDirectories);
+
+                var objects = new List<MapObjectsContainerItem>();
+
+                var item = new MapObjectsContainerItem {
+                    Description = "Player Start",
+                    MapGeometryType = MapGeometryTypes.NONE,
+                    MapObjectType = MapObjectTypes.PLAYER_START,
+                    PreviewImage = string.Empty
+                };
+
+                objects.Add(item);
+
+                foreach (var file in files) {
+                    item = new MapObjectsContainerItem {
+                        Description = file,
+                        MapGeometryType = file.Contains("WALL") ? MapGeometryTypes.WALL : MapGeometryTypes.FLOOR,
+                        MapObjectType = MapObjectTypes.TEXTURE,
+                        PreviewImage = file
+                    };
+
+                    objects.Add(item);
+                }
+
+                MapObjects = new ObservableCollection<MapObjectsContainerItem>(objects);
+
+                var jsonStr = JsonConvert.SerializeObject(objects);
+
+                File.WriteAllText("mapobjects.json", jsonStr);
+
                 return;
             }
 
